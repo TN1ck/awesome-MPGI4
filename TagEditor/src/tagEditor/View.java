@@ -9,6 +9,8 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Panel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
@@ -17,7 +19,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
@@ -94,6 +100,9 @@ public class View extends JFrame{
 		this.setTitle("ID3-Tag-Editor");
 		this.setSize(800,500);
 		
+		// Add main menu
+		initMainMenu();
+		
 		setLayout();
 		
 	}
@@ -139,6 +148,47 @@ public class View extends JFrame{
 		
 		
 			}
+
+	/**
+	 * Adds main menu. 
+	 */	
+	private void initMainMenu()
+	{
+		JMenuBar mainMenu = new JMenuBar();
+
+		// Menu "Datei"
+		JMenu fileMenu = new JMenu("Datei");
+		fileMenu.setMnemonic('d');
+
+		JMenuItem jmiOpen = new JMenuItem("Verzeichnis öffnen...");
+		jmiOpen.setMnemonic('f');		
+		fileMenu.add(jmiOpen);
+		
+		JMenuItem jmiSave = new JMenuItem("Metadaten speichern...");
+		jmiSave.setMnemonic('s');		
+		fileMenu.add(jmiSave);		
+
+		fileMenu.add(new JSeparator());
+		
+		JMenuItem jmiExit = new JMenuItem("Beenden");
+		jmiExit.setMnemonic('e');		
+		fileMenu.add(jmiExit);
+		
+		mainMenu.add(fileMenu);
+		
+		// Menu "Hilfe"		
+		JMenu helpMenu = new JMenu("Hilfe");
+
+		helpMenu.setMnemonic('h');
+		JMenuItem jmiAbout = new JMenuItem("Info");
+		jmiAbout.setMnemonic('i');		
+		helpMenu.add(jmiAbout);
+
+		mainMenu.add(helpMenu);
+		
+		this.setJMenuBar(mainMenu);		
+	}	
+	
 	public static void main(String[] args) {
 		
 		
