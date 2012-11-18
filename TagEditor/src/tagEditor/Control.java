@@ -1,5 +1,7 @@
 package tagEditor;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
@@ -22,8 +24,9 @@ import resources.TestImages;
  * This class represents the control in MVC. It will communicate between view and model 
  *
  */
-public class Control {
+public class Control implements ActionListener{
 	private View GUI;
+	private MP3File currentMP3;
 	private DefaultMutableTreeNode tree = new DefaultMutableTreeNode();
 	
 	/**
@@ -32,6 +35,7 @@ public class Control {
 	public Control() {
 		this.fillTree();
 		this.GUI = new View(this.getTree());
+		GUI.getJmiSave().addActionListener(this);
 	}
 	
 	/** Method to fill the tree, just for testing atm
@@ -77,6 +81,8 @@ public class Control {
 	}
 	
 	private class TreeListener implements TreeSelectionListener {
+		
+		
 		public void valueChanged(TreeSelectionEvent e) {
 			// Get the element that is the depth of the current selection
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.getPath().getLastPathComponent();
@@ -85,6 +91,9 @@ public class Control {
 	        Object nodeInfo = node.getUserObject();
 	        if (node.isLeaf()) {
 	            MP3File mp3 = (MP3File)nodeInfo;
+	            
+	            currentMP3 = mp3;
+	            
 	            // Update the UI
 	            GUI.getSong().setText(mp3.getSong());
 	            GUI.getArtist().setText(mp3.getArtist());
@@ -109,6 +118,20 @@ public class Control {
 
 		// Exit program, if window is closed
 		demoControl.getGUI().setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+	}
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		// TODO Auto-generated method stub
+
+		if (arg0.getActionCommand() == "Metadaten speichern...") {
+				
+			currentMP3.setAlbum(GUI.getAlbum().getText());
+			currentMP3.setArtist(GUI.getArtist().getText());
+			currentMP3.setYear(GUI.getYear().getText());
+			currentMP3.setSong(GUI.getSong().getText());
+
+		}
 
 	}
 

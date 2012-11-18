@@ -13,33 +13,49 @@ import javax.swing.event.TreeSelectionListener;
 /** This class represents a MP3-File*/
 class MP3File {
 	
-	public String getArtist() {
-		return artist;
-	}
-	
-
-	public String getSong() {
-		return song;
-	}
-
-	public String getAlbum() {
-		return album;
-	}
-
-	public String getYear() {
-		return year;
-	}
-
-	public BufferedImage getCover() {
-		return cover;
-	}
-	
 	private String artist;
 	private String song;
 	private String album;
 	private String year;
 	private BufferedImage cover;
 	
+	
+	public String getArtist() {
+		return artist;
+	}
+	
+	public void setArtist(String newArtist) {
+		artist = newArtist;
+	}
+
+	public String getSong() {
+		return song;
+	}
+
+	public void setSong(String newSong) {
+		song = newSong;
+	}
+	
+	public String getAlbum() {
+		return album;
+	}
+
+	public void setAlbum(String newAlbum) {
+		album = newAlbum;
+	}
+	
+	public String getYear() {
+		return year;
+	}
+
+	public void setYear(String newYear) {
+		year = newYear;
+	}
+	
+	public BufferedImage getCover() {
+		return cover;
+	}
+
 	/**
 	 * Constructor-Method for creating the meta-info of a mp3-file
 	 * 
