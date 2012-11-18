@@ -2,6 +2,8 @@ package tagEditor;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
@@ -25,7 +27,7 @@ import resources.TestImages;
  * and model
  * 
  */
-public class Control implements ActionListener {
+public class Control {
 	private View GUI;
 	private MP3File currentMP3;
 	private DefaultMutableTreeNode tree = new DefaultMutableTreeNode();
@@ -36,7 +38,8 @@ public class Control implements ActionListener {
 	public Control() {
 		this.fillTree();
 		this.GUI = new View(this.getTree());
-		GUI.getJmiSave().addActionListener(this);
+		GUI.getJmiSave().addActionListener(new SaveListener());
+		GUI.getInformationArea().addMouseListener(new MouseSaveListener());
 	}
 
 	/**
@@ -126,18 +129,45 @@ public class Control implements ActionListener {
 
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
-
-		if (arg0.getActionCommand() == "Metadaten speichern...") {
-
+	private class SaveListener implements ActionListener {
+		public void actionPerformed(ActionEvent arg0) {
+			// TODO Auto-generated method stub
+	
+			if (arg0.getActionCommand() == "Metadaten speichern...") {
+	
+				if (currentMP3 != null) {
+					currentMP3.setAlbum(GUI.getAlbum().getText());
+					currentMP3.setArtist(GUI.getArtist().getText());
+					currentMP3.setYear(GUI.getYear().getText());
+					currentMP3.setSong(GUI.getSong().getText());
+					GUI.getTree().updateUI();
+				}
+			}
+	
+		}
+	}
+	private class MouseSaveListener implements MouseListener {
+		public void mouseClicked(MouseEvent e){
 			if (currentMP3 != null) {
 				currentMP3.setAlbum(GUI.getAlbum().getText());
 				currentMP3.setArtist(GUI.getArtist().getText());
 				currentMP3.setYear(GUI.getYear().getText());
 				currentMP3.setSong(GUI.getSong().getText());
+				GUI.getTree().updateUI();
 			}
+		}
+		public void mousePressed(MouseEvent e) {
+		       
+		}
+
+		public void mouseReleased(MouseEvent e) {
+		      
+		}
+
+		public void mouseEntered(MouseEvent e) {
+		}
+
+		public void mouseExited(MouseEvent e) {
 		}
 
 	}

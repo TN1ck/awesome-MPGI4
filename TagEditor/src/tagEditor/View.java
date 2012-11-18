@@ -51,6 +51,7 @@ public class View extends JFrame {
 	private JLabel cover;
 	private JMenuItem jmiSave;
 	private JButton editCover;
+	private Container informationArea;
 
 	public JMenuItem getJmiSave() {
 		return jmiSave;
@@ -75,6 +76,13 @@ public class View extends JFrame {
 
 	public JLabel getCover() {
 		return cover;
+	}
+	public JScrollPane getTree(){
+		return treeView;
+	}
+	public Container getInformationArea() {
+		return this.informationArea;
+		
 	}
 
 	/**
@@ -107,7 +115,7 @@ public class View extends JFrame {
 		this.year.setPreferredSize(new Dimension(200, 20));
 		this.editCover.setPreferredSize(new Dimension(100, 20));
 		this.treeView.setPreferredSize(new Dimension(200, 400));
-
+		
 		// Setup Window
 		this.setTitle("ID3-Tag-Editor");
 		this.setSize(800, 500);
@@ -124,7 +132,7 @@ public class View extends JFrame {
 	 */
 	private void setLayout() {
 
-		Container informationArea = new Container();
+		this.informationArea = new Container();
 		// This Layout isn't optimal
 		informationArea.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
