@@ -16,6 +16,7 @@ class MP3File {
 	public String getArtist() {
 		return artist;
 	}
+	
 
 	public String getSong() {
 		return song;
