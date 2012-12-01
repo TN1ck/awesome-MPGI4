@@ -55,6 +55,10 @@ class MP3File {
 	public BufferedImage getCover() {
 		return cover;
 	}
+	
+	public void setCover(BufferedImage newCover) {
+		cover = newCover;
+	}
 
 	/**
 	 * Constructor-Method for creating the meta-info of a mp3-file
@@ -71,6 +75,10 @@ class MP3File {
 		this.album = album;
 		this.year = year;
 		this.cover = cover;
+	}
+	
+	public MP3File(){
+		
 	}
 	
 	/**String representation of the file, needed for the Tree-UI

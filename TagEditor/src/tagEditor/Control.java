@@ -16,6 +16,14 @@ import javax.swing.tree.TreeSelectionModel;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.MemoryCacheImageInputStream;
@@ -46,21 +54,66 @@ public class Control {
 	 * Method to fill the tree, just for testing atm
 	 * 
 	 */
-	private void fillTree() {
-		DefaultMutableTreeNode directory;
-		DefaultMutableTreeNode mp3File;
-
-		directory = new DefaultMutableTreeNode(new Directory("Refused"));
-		tree.add(directory);
-
-		mp3File = new DefaultMutableTreeNode(new MP3File("Refused",
-				"New Noise", "The ...", "1998",
-				this.bytesToPicture(TestImages.jpeg)));
-		directory.add(mp3File);
-
-		mp3File = new DefaultMutableTreeNode(new MP3File("Nirvana", "In Utero",
-				"Dumb", "1993", this.bytesToPicture(TestImages.png)));
-		directory.add(mp3File);
+	
+	private void fillTree(){
+		MP3_FileVisitor fileVisitor = new MP3_FileVisitor();
+        fileVisitor.pathMatcher = FileSystems.getDefault().
+        getPathMatcher("glob:" + "*mp3*");
+        try {
+			Files.walkFileTree(Paths.get("/Users/Tom/Dropbox/3 Semester/MPGI 4/Mp3 Sammlung/"), fileVisitor);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
+	
+	private class MP3_FileVisitor extends SimpleFileVisitor<Path>{
+		private PathMatcher pathMatcher;
+		private DefaultMutableTreeNode currentDirectory;
+		private DefaultMutableTreeNode mp3File;
+		private MP3Parser Parser = new MP3Parser();
+		private MP3File mp3;
+		private Directory directory;
+		
+		@Override
+		public FileVisitResult visitFile(Path filePath, BasicFileAttributes basicFileAttributes) {
+			if(filePath.getFileName() != null && pathMatcher.matches(filePath.getFileName())){
+				System.out.println("FILE:" + filePath);
+				mp3 = new MP3File();
+				mp3 = Parser.readMP3(filePath);
+				mp3.setCover(bytesToPicture(TestImages.png));
+				mp3File =  new DefaultMutableTreeNode(mp3);
+				currentDirectory.add(mp3File);
+		
+			}
+			return FileVisitResult.CONTINUE;
+		}
+		
+		@Override
+	    public FileVisitResult preVisitDirectory(Path directoryPath, BasicFileAttributes attrs) {
+	        if (directoryPath.getFileName() != null){
+	        		directory = new Directory(directoryPath.getFileName().toString());
+	        		DefaultMutableTreeNode tempDirectory = new DefaultMutableTreeNode(directory); 
+	        		if(currentDirectory != null){
+		        		currentDirectory.add(tempDirectory);
+		        		currentDirectory = tempDirectory;
+	        		} else {
+	        			currentDirectory = tempDirectory;
+	        			tree.add(currentDirectory);
+	        		}
+	            	System.out.println("DIR: " + directoryPath);
+	        }
+	        return FileVisitResult.CONTINUE;
+	    }
+		
+		@Override
+		public FileVisitResult postVisitDirectory(Path directoryPath,IOException exc){
+			currentDirectory = (DefaultMutableTreeNode) currentDirectory.getParent();
+			return FileVisitResult.CONTINUE;
+		}
+		
 	}
 
 	private BufferedImage bytesToPicture(byte[] picture) {
@@ -172,4 +225,6 @@ public class Control {
 
 	}
 	
+	
 }
+
