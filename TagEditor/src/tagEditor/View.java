@@ -126,7 +126,7 @@ public class View extends JFrame {
 		setLayout();
 
 	}
-
+	
 	/**
 	 * Sets the layout of the UI.
 	 */

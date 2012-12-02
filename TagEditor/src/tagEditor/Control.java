@@ -83,7 +83,6 @@ public class Control {
 				System.out.println("FILE:" + filePath);
 				mp3 = new MP3File();
 				mp3 = Parser.readMP3(filePath);
-				mp3.setCover(bytesToPicture(TestImages.png));
 				mp3File =  new DefaultMutableTreeNode(mp3);
 				currentDirectory.add(mp3File);
 		

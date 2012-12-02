@@ -17,7 +17,7 @@ class MP3File {
 	private String song;
 	private String album;
 	private String year;
-	private BufferedImage cover;
+	private byte[] cover;
 	
 	
 	public String getArtist() {
@@ -52,11 +52,11 @@ class MP3File {
 		year = newYear;
 	}
 	
-	public BufferedImage getCover() {
+	public byte[] getCover() {
 		return cover;
 	}
 	
-	public void setCover(BufferedImage newCover) {
+	public void setCover(byte[] newCover) {
 		cover = newCover;
 	}
 
@@ -69,7 +69,7 @@ class MP3File {
 	 * @param year The year the file was recorded
 	 * @param cover The cover of the album
 	 */
-	public MP3File(String artist, String song, String album, String year, BufferedImage cover) {
+	public MP3File(String artist, String song, String album, String year, byte[] cover) {
 		this.artist = artist;
 		this.song = song;
 		this.album = album;
