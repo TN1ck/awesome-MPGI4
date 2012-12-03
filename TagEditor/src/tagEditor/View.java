@@ -19,6 +19,7 @@ import java.awt.event.ItemListener;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -50,8 +51,14 @@ public class View extends JFrame {
 	// JLabel will have a ImageIcon inside to display the image
 	private JLabel cover;
 	private JMenuItem jmiSave;
+	private JMenuItem jmiOpen;
 	private JButton editCover;
 	private Container informationArea;
+	private JFileChooser fileChooser;
+	
+	public JMenuItem getJmiOpen() {
+		return jmiOpen;
+	}
 
 	public JMenuItem getJmiSave() {
 		return jmiSave;
@@ -181,7 +188,7 @@ public class View extends JFrame {
 		JMenu fileMenu = new JMenu("Datei");
 		fileMenu.setMnemonic('d');
 
-		JMenuItem jmiOpen = new JMenuItem("Verzeichnis šffnen...");
+		jmiOpen = new JMenuItem("Verzeichnis šffnen...");
 		jmiOpen.setMnemonic('f');
 		fileMenu.add(jmiOpen);
 

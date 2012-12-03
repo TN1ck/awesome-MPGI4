@@ -7,6 +7,7 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
@@ -15,6 +16,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
@@ -38,16 +40,16 @@ import resources.TestImages;
 public class Control {
 	private View GUI;
 	private MP3File currentMP3;
-	private DefaultMutableTreeNode tree = new DefaultMutableTreeNode();
+	private DefaultMutableTreeNode tree = new DefaultMutableTreeNode(null);
 
 	/**
 	 * Constructor-method of the control. Will fill the tree when called.
 	 */
 	public Control() {
-		this.fillTree();
 		this.GUI = new View(this.getTree());
 		GUI.getJmiSave().addActionListener(new SaveListener());
 		GUI.getInformationArea().addMouseListener(new MouseSaveListener());
+		GUI.getJmiOpen().addActionListener(new FileChooserListener());
 	}
 
 	/**
@@ -55,12 +57,12 @@ public class Control {
 	 * 
 	 */
 	
-	private void fillTree(){
+	private void fillTree(String pathToDirectory){
 		MP3_FileVisitor fileVisitor = new MP3_FileVisitor();
         fileVisitor.pathMatcher = FileSystems.getDefault().
-        getPathMatcher("glob:" + "*mp3*");
+        getPathMatcher("glob:" + "*.mp3*");
         try {
-			Files.walkFileTree(Paths.get("/Users/Tom/Dropbox/3 Semester/MPGI 4/Mp3 Sammlung/"), fileVisitor);
+			Files.walkFileTree(Paths.get(pathToDirectory), fileVisitor);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -104,6 +106,11 @@ public class Control {
 	        		}
 	            	System.out.println("DIR: " + directoryPath);
 	        }
+	        return FileVisitResult.CONTINUE;
+	    }
+		
+		@Override
+	    public FileVisitResult visitFileFailed(Path filePath, IOException exc) {
 	        return FileVisitResult.CONTINUE;
 	    }
 		
@@ -180,7 +187,20 @@ public class Control {
 		demoControl.getGUI().setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 	}
-
+	private class FileChooserListener implements ActionListener {
+		 public void actionPerformed(ActionEvent actionEvent) {
+		        JFileChooser theFileChooser = new JFileChooser(".");
+		        theFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		        int returnval = theFileChooser.showOpenDialog(null);
+		        if (returnval == JFileChooser.APPROVE_OPTION) {
+		          File selectedFile = theFileChooser.getSelectedFile();
+		          System.out.println(selectedFile.getPath());
+		          fillTree(selectedFile.getPath());
+		        } 
+		      }
+		 
+	}
+	
 	private class SaveListener implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
 			// TODO Auto-generated method stub
