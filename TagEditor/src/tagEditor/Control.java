@@ -13,6 +13,8 @@ import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeSelectionModel;
 
 import java.io.ByteArrayInputStream;
@@ -40,7 +42,7 @@ import resources.TestImages;
 public class Control {
 	private View GUI;
 	private MP3File currentMP3;
-	private DefaultMutableTreeNode tree = new DefaultMutableTreeNode(null);
+	private DefaultMutableTreeNode tree;
 
 	/**
 	 * Constructor-method of the control. Will fill the tree when called.
@@ -102,7 +104,9 @@ public class Control {
 		        		currentDirectory = tempDirectory;
 	        		} else {
 	        			currentDirectory = tempDirectory;
-	        			tree.add(currentDirectory);
+	        			TreeModel temp = new DefaultTreeModel(currentDirectory);
+	        			tree = new DefaultMutableTreeNode(temp);
+	        			GUI.getTree().setModel(temp);
 	        		}
 	            	System.out.println("DIR: " + directoryPath);
 	        }

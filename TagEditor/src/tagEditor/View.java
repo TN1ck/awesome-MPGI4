@@ -55,6 +55,7 @@ public class View extends JFrame {
 	private JButton editCover;
 	private Container informationArea;
 	private JFileChooser fileChooser;
+	private JTree tree;
 	
 	public JMenuItem getJmiOpen() {
 		return jmiOpen;
@@ -84,12 +85,15 @@ public class View extends JFrame {
 	public JLabel getCover() {
 		return cover;
 	}
-	public JScrollPane getTree(){
+	public JScrollPane getTreeView(){
 		return treeView;
 	}
 	public Container getInformationArea() {
 		return this.informationArea;
 		
+	}
+	public JTree getTree() {
+		return tree;
 	}
 
 	/**
@@ -114,6 +118,8 @@ public class View extends JFrame {
 		this.yearLabel = new JLabel("Jahr:");
 		this.editCover = new JButton("edit Cover");
 		// The tree should be scroll-able
+		this.tree = tree;
+		//tree.setRootVisible(false);
 		this.treeView = new JScrollPane(tree);
 		// Set the preferred dimensions
 		this.song.setPreferredSize(new Dimension(200, 20));
