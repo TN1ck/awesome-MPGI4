@@ -1,11 +1,13 @@
 package tagEditor;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -13,6 +15,7 @@ import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeSelectionModel;
@@ -139,6 +142,7 @@ public class Control {
 	public JTree getTree() {
 		// Initialize the tree
 		JTree DataTree = new JTree(this.tree);
+		DataTree.setCellRenderer(new CustomIconRenderer());
 		DataTree.getSelectionModel().setSelectionMode(
 				TreeSelectionModel.SINGLE_TREE_SELECTION);
 		// Listeners are strange...
@@ -161,7 +165,7 @@ public class Control {
 			if (node == null)
 				return;
 			Object nodeInfo = node.getUserObject();
-			if (node.isLeaf()) {
+			if (node.isLeaf() && nodeInfo instanceof MP3File ) {
 				MP3File mp3 = (MP3File) nodeInfo;
 
 				currentMP3 = mp3;
@@ -249,5 +253,27 @@ public class Control {
 	}
 	
 	
+}
+
+class CustomIconRenderer extends DefaultTreeCellRenderer {
+	Icon mp3Icon;
+	Icon directoryIcon;
+	public CustomIconRenderer() {
+		mp3Icon = new DefaultTreeCellRenderer().getDefaultLeafIcon();
+		directoryIcon = new DefaultTreeCellRenderer().getDefaultClosedIcon();
+	}
+	public Component getTreeCellRendererComponent(JTree tree,
+	Object value,boolean sel,boolean expanded,boolean leaf,
+	int row,boolean hasFocus) {
+		super.getTreeCellRendererComponent(tree, value, sel,expanded, leaf, row, hasFocus);
+		Object nodeObj = ((DefaultMutableTreeNode)value).getUserObject();
+		// check whatever you need to on the node user object
+		if (nodeObj instanceof Directory) {
+			setIcon(directoryIcon);
+		} else {
+			setIcon(mp3Icon);
+		}
+		return this;
+	}
 }
 
