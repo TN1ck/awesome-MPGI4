@@ -65,6 +65,7 @@ public class MP3Parser {
 	
 
 	private void setData(int tagSize, MP3File mp3){
+		
 		for(int i = 10; i < tagSize;){
 			byte[] frameHeader = new byte[4];
 			byte[] temp = new byte[4];
