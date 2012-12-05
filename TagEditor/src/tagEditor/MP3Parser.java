@@ -41,13 +41,12 @@ public class MP3Parser {
 		byte[] temp = new byte[3];
 		s.read(temp);
 		String IDString = new String(temp);
-		System.out.println(IDString);
 		MP3File mp3 = new MP3File();
 		
 		if(IDString.equals("ID3")){
 			byte mainversion = s.readByte();
 			byte subversion = s.readByte();
-			if(mainversion == 3 || mainversion == 4){
+			if(mainversion == 3 && subversion == 0){
 				byte flags = s.readByte();	
 				if(flags == 0){
 					byte[] id3Size = new byte[4]; 
@@ -87,7 +86,8 @@ public class MP3Parser {
 				byte[] temp2 = new byte[4];
 				s.read(temp2);
 				f.ID = new String(temp2);
-				System.out.println(f.ID);
+				if(!f.ID.matches("\\w{4}"))
+					break;
 				f.size = s.readInt();
 				f.flags = s.readShort();
 				if(f.ID.equals("APIC")) {
@@ -110,12 +110,11 @@ public class MP3Parser {
 				}
 				else{
 					f.encodingflag = s.readByte();
-					f.body = new byte[f.size -1];
+					if(f.size > 1)
+						f.body = new byte[f.size -1];
 				}
-				
-				s.read(f.body);
-				if(f.ID.equals("COMM"))
-				System.out.println(new String(f.body));
+				if(f.body != null)
+					s.read(f.body);
 				
 				frames.add(f);
 			}
@@ -211,7 +210,7 @@ public class MP3Parser {
 		MP3Parser TestParser = new MP3Parser();
 		MP3File mp3 = new MP3File();
 		try {
-			mp3 = TestParser.readMP3(Paths.get("/Users/Tom/Dropbox/3 Semester/MPGI 4/Mp3 Sammlung/The Whind Whistles/Animals are people too/01_Turtle.mp3"));
+			mp3 = TestParser.readMP3(Paths.get("/Users/Tom/Dropbox/3 Semester/MPGI 4/The Whind Whistles/Animals are people too/01_Turtle.mp3"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -179,7 +179,22 @@ public class Control {
 				GUI.getArtist().setText(mp3.getArtist());
 				GUI.getAlbum().setText(mp3.getAlbum());
 				GUI.getYear().setText(mp3.getYear());
-				GUI.getCover().setIcon(new ImageIcon(mp3.getCover()));
+				if(mp3.getCover() != null){
+					ImageIcon newImage = new ImageIcon(mp3.getCover());
+					GUI.getCover().setIcon(new ImageIcon(newImage.getImage().getScaledInstance(250,250,java.awt.Image.SCALE_SMOOTH)));
+				}
+				else {
+					ImageIcon newImage = new ImageIcon(Paths.get("./ressources/noimage.jpg").toString());
+					GUI.getCover().setIcon(new ImageIcon(newImage.getImage().getScaledInstance(250,250,java.awt.Image.SCALE_SMOOTH)));
+				}
+			} 
+			else{
+				GUI.getSong().setText("");
+				GUI.getArtist().setText("");
+				GUI.getAlbum().setText("");
+				GUI.getYear().setText("");
+				GUI.getCover().setIcon(new ImageIcon(Paths.get("./ressources/spaceholder.png").toString()));
+			
 			}
 		}
 	}
