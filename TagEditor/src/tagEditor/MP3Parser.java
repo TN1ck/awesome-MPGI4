@@ -1,10 +1,13 @@
 package tagEditor;
 
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Set;
 import java.lang.String;
 
 public class MP3Parser {
@@ -12,168 +15,194 @@ public class MP3Parser {
 	/**
 	 * @param args
 	 */
-	byte[] mp3ByteFile;
-
 	Charset utf16charset= Charset.forName("UTF-16");
 	Charset iso88591charset = Charset.forName("ISO-8859-1");
 	Charset utf8charset = Charset.forName("UTF-8");
+	
+	private RandomAccessFile s;
 
 	
 	private int TagToInt(byte[] bytes){
 	
 		return (bytes[3] & 0xFF) | ((bytes[2] & 0xFF) << 7 ) | ((bytes[1] & 0xFF) << 14 ) | ((bytes[0] & 0xFF) << 21 );
 	}
+	
 	private int FrameToInt(byte[] bytes){
 		return 10+(bytes[3] & 0xFF) | ((bytes[2] & 0xFF) << 8 ) | ((bytes[1] & 0xFF) << 16 ) | ((bytes[0] & 0xFF) << 24 );
 		
 	}
 	
 	public MP3Parser(){
-		
-		
+			
 	}
 	
-	
-	public MP3File readMP3(Path pathToFile){
-		byte[] ID = new byte[3];
-		byte[] version = new byte[2];
-		byte[] flags = new byte[1];
-		byte[] byteSize = new byte[4];
+	public MP3File readMP3(Path filePath) throws IOException{
+		s = new RandomAccessFile(filePath.toString(), "r");	
+		byte[] temp = new byte[3];
+		s.read(temp);
+		String IDString = new String(temp);
+		System.out.println(IDString);
 		MP3File mp3 = new MP3File();
-		int tagSize;
 		
-		try{
-			mp3ByteFile = Files.readAllBytes(pathToFile);
-		} catch(IOException e){
-			System.out.println(e.getStackTrace());
-		}
-		for(int i = 0; i< 3;i++){
-			ID[i] = mp3ByteFile[i];
+		if(IDString.equals("ID3")){
+			byte mainversion = s.readByte();
+			byte subversion = s.readByte();
+			if(mainversion == 3 || mainversion == 4){
+				byte flags = s.readByte();	
+				if(flags == 0){
+					byte[] id3Size = new byte[4]; 
+					s.read(id3Size);			
+					mp3.setSize(TagToInt(id3Size));
+					ArrayList<Frame> frames = parseFrames(mp3.getSize());
+					mp3.setFrames(frames);
+					mp3.setAlbum(getAlbum(frames));
+					mp3.setArtist(getArtist(frames));
+					mp3.setCover(getCover(frames));
+					mp3.setSong(getSong(frames));
+					mp3.setYear(getYear(frames));
+				} 
+				else
+					throw(new IOException("ID3 flags are set!"));
+			} 
+			else
+				throw(new IOException("Invalid ID3 version!"));
 		} 
-		for(int i = 3; i< 5;i++){
-			version[i -3] = mp3ByteFile[i];
-		}
-		flags[0] = mp3ByteFile[5];
-		for(int i = 6; i< 10;i++){
-			byteSize[i -6] = mp3ByteFile[i];
-		}	
-		tagSize = TagToInt(byteSize);
-		setData(tagSize,mp3);
+		else
+			throw(new IOException("Invalid or corrupted MP3 file!"));
+		
 		return mp3;
 		
 	}
 	
-
-	private void setData(int tagSize, MP3File mp3){
-		
-		for(int i = 10; i < tagSize;){
-			byte[] frameHeader = new byte[4];
-			byte[] temp = new byte[4];
-			int frameSize = 0;
-			Charset charset = iso88591charset;
-			for(int j = i;j< i+4;j++){
-				frameHeader[j -i] = mp3ByteFile[j];
-			} 
-			if(new String(frameHeader).equals("TPE1")){
-				int currentPos = i+4;
-				for(int j = currentPos;j< currentPos+4;j++){
-					temp[j -currentPos] = mp3ByteFile[j];
-				}
-				frameSize = FrameToInt(temp);
-				currentPos += 6;
-				if(mp3ByteFile[currentPos+1] == -1 && mp3ByteFile[currentPos+2] == -2){
-					charset = iso88591charset;
-					currentPos += 3;
-				}
-				byte[] frameData = new byte[frameSize];
-				for(int j = currentPos; j <i+frameSize;j++){
-						frameData[j - currentPos] = mp3ByteFile[j];		
-				}
-				mp3.setArtist(new String(frameData,charset));
-				i += frameSize;
-			}
-			else if(new String(frameHeader).equals("TIT2")){
-				int currentPos = i+4;
-				for(int j = currentPos;j< currentPos+4;j++){
-					temp[j -currentPos] = mp3ByteFile[j];
-				}
-				frameSize = FrameToInt(temp);
-				currentPos += 6;
-				if(mp3ByteFile[currentPos+1] == -1 && mp3ByteFile[currentPos+2] == -2){
-					charset = iso88591charset;
-					currentPos += 3;
-				}
-				byte[] frameData = new byte[frameSize];
-				for(int j = currentPos; j <i+frameSize;j++){
-						frameData[j - currentPos] = mp3ByteFile[j];		
-				}
-				mp3.setSong(new String(frameData,charset));
-				i += frameSize;
-			}
-			else if(new String(frameHeader).equals("TALB")){
-				int currentPos = i+4;
-				for(int j = currentPos;j< currentPos+4;j++){
-					temp[j -currentPos] = mp3ByteFile[j];
-				}
-				frameSize = FrameToInt(temp);
-				currentPos += 6;
-				if(mp3ByteFile[currentPos+1] == -1 && mp3ByteFile[currentPos+2] == -2){
-					charset = iso88591charset;
-					currentPos += 3;
-				}
-				byte[] frameData = new byte[frameSize];
-				for(int j = currentPos; j <i+frameSize;j++){
-						frameData[j - currentPos] = mp3ByteFile[j];		
-				}
-				mp3.setAlbum(new String(frameData,charset));
-				i += frameSize;
-			}
-			else if(new String(frameHeader).equals("TYER")){
-				int currentPos = i+4;
-				for(int j = currentPos;j< currentPos+4;j++){
-					temp[j -currentPos] = mp3ByteFile[j];
-				}
-				frameSize = FrameToInt(temp);
-				currentPos += 6;
-				if(mp3ByteFile[currentPos+1] == -1 && mp3ByteFile[currentPos+2] == -2){
-					charset = iso88591charset;
-					currentPos += 3;
-				}
-				byte[] frameData = new byte[frameSize];
-				for(int j = currentPos; j <i+frameSize;j++){
-						frameData[j - currentPos] = mp3ByteFile[j];		
-				}
-				mp3.setYear(new String(frameData,charset));
-				i += frameSize;
-			}
-			else if(new String(frameHeader).equals("APIC")){
-				int currentPos = i+4;
-				for(int j = currentPos;j< currentPos+4;j++){
-					temp[j -currentPos] = mp3ByteFile[j];
-				}
-				frameSize = FrameToInt(temp);
-				currentPos += 6;
-				currentPos++;
-				byte[] frameData = new byte[frameSize];
-				for(int k = currentPos;0x00 != mp3ByteFile[k];k++){
-					currentPos++;
-				}
-				currentPos += 2;
-				for(int k = currentPos;0x00 != mp3ByteFile[k];k++){
-					currentPos++;
-				}
-				currentPos++;
-				for(int j = currentPos; j <i+frameSize;j++){
-						frameData[j - currentPos] = mp3ByteFile[j];		
-				}
-				mp3.setCover(frameData);
-				i += frameSize;
-			} else {
-				i++;
-			}
+	
+	private ArrayList<Frame> parseFrames(int size) throws IOException
+	{
+		ArrayList<Frame> frames = new ArrayList<Frame>();
+		while(s.getFilePointer() < size){
+			if(s.readByte() != 0x00) {// check if valid frame or NULL area
+				s.seek(s.getFilePointer() - 1); // reset fp from previous check
 				
+				Frame f = new Frame();
+				
+				byte[] temp2 = new byte[4];
+				s.read(temp2);
+				f.ID = new String(temp2);
+				System.out.println(f.ID);
+				f.size = s.readInt();
+				f.flags = s.readShort();
+				if(f.ID.equals("APIC")) {
+					int size2 = 0;
+					f.encodingflag = s.readByte();
+					size2++;
+					for(byte b = s.readByte();0x00 != b;b = s.readByte()){
+							f.MIMEType += new String(new byte[]{b});
+							size2++;
+					}			
+					s.read(f.pictureType);
+					size2++;
+					for(byte b = s.readByte();0x00 != b;b = s.readByte()){
+						f.imageDescription += new String(new byte[]{b});
+						size2++;
+					}
+					System.out.println(f.imageDescription);
+					f.body = new byte[f.size - (size2 +2)];
+					
+				}
+				else{
+					f.encodingflag = s.readByte();
+					f.body = new byte[f.size -1];
+				}
+				
+				s.read(f.body);
+				if(f.ID.equals("COMM"))
+				System.out.println(new String(f.body));
+				
+				frames.add(f);
+			}
 		}
+		return frames;
 	}
+	
+
+	
+	/**
+	 * Get parsed frame objects.
+	 * @return
+	 */
+	public ArrayList<Frame> getFrames(ArrayList<Frame> frames){
+		return frames;
+	}
+	
+	/**
+	 * Search through frames for the artist.
+	 * @return Artist name or empty string if not specified.
+	 */
+	public String getArtist(	ArrayList<Frame> frames){
+		for(Frame f : frames)
+		{
+			if(f.ID.equals("TPE1"))
+				return f.toString();
+		}
+		
+		return "";
+	}
+	
+	/**
+	 * Search through frames for the album name.
+	 * @return Album name or empty string if not specified.
+	 */
+	public String getAlbum(	ArrayList<Frame> frames){
+		for(Frame f : frames)
+		{
+			if(f.ID.equals("TALB"))
+				return f.toString();
+		}
+		
+		return "";
+	}
+	
+	/**
+	 * Search through frames for the track title.
+	 * @return Track name or empty string if not specified.
+	 */
+	public String getSong(	ArrayList<Frame> frames){
+		for(Frame f : frames)
+		{
+			if(f.ID.equals("TIT2"))
+				return f.toString();
+		}
+		
+		return "";
+	}
+	
+	/**
+	 * Search through frames for the year.
+	 * @return Year or empty string if not specified.
+	 */
+	public String getYear(ArrayList<Frame> frames){
+		for(Frame f : frames)
+		{
+			if(f.ID.equals("TYER"))
+				return f.toString();
+		}
+		
+		return "";
+	}
+	
+	/**
+	 * Search through frames for the album cover.
+	 * @return Image data array or null if not specified.
+	 */
+	public byte[] getCover(	ArrayList<Frame> frames){
+		for(Frame f : frames)
+		{
+			if(f.ID.equals("APIC"))
+				return f.body;
+		}
+		
+		return null;
+	}
+
 
 	
 	public static void main(String[] args) {
@@ -181,8 +210,16 @@ public class MP3Parser {
 		
 		MP3Parser TestParser = new MP3Parser();
 		MP3File mp3 = new MP3File();
-		mp3 = TestParser.readMP3(Paths.get("/Users/Tom/Dropbox/3 Semester/MPGI 4/Mp3 Sammlung/The Whind Whistles/Animals are people too/01_Turtle.mp3"));
+		try {
+			mp3 = TestParser.readMP3(Paths.get("/Users/Tom/Dropbox/3 Semester/MPGI 4/Mp3 Sammlung/The Whind Whistles/Animals are people too/01_Turtle.mp3"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println(mp3.getAlbum());
 		System.out.println(mp3.getSong());
+		System.out.println(mp3.getArtist());
+		System.out.println(mp3.getYear());
 	}
 
 }

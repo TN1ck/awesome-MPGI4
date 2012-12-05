@@ -89,7 +89,11 @@ public class Control {
 			if(filePath.getFileName() != null && pathMatcher.matches(filePath.getFileName())){
 				System.out.println("FILE:" + filePath);
 				mp3 = new MP3File();
-				mp3 = Parser.readMP3(filePath);
+				try {
+					mp3 = Parser.readMP3(filePath);
+				} catch (IOException e) {
+					return FileVisitResult.CONTINUE;
+				}
 				mp3File =  new DefaultMutableTreeNode(mp3);
 				currentDirectory.add(mp3File);
 		
