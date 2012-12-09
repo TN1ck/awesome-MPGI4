@@ -269,7 +269,7 @@ class Frame {
 	public int getSize(){
 		if(this.ID.equals("APIC")){
 			// Encoding flg + 2 eofs
-			return body.length +  1 + MIMEType.getBytes(ascii).length + 1 + pictureType.length + imageDescription.getBytes(utf16charset).length + 1;
+			return 1 + MIMEType.length() + 1 + pictureType.length + imageDescription.length() + 1 + body.length;
 		} else {
 			// beware of the encoding flag!
 			return body.length +1;

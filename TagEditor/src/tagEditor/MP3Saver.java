@@ -38,7 +38,7 @@ public class MP3Saver {
  				sN.write(new byte[]{0});
  				
  				sN.write(f.getPictureType());
- 				sN.write(f.getImageDescription().getBytes(utf16charset));
+ 				sN.write(f.getImageDescription().getBytes(ascii));
  				sN.write(new byte[]{0});
  			}
  			sN.write(f.getBody());
