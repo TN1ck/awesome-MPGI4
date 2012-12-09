@@ -10,12 +10,13 @@ public class MP3Saver {
 	private RandomAccessFile s;
 	
 	public void saveMP3(MP3File mp3) throws IOException{
+		mp3.setFrames();
+		
 		s = new RandomAccessFile(mp3.getPath(), "r");
-		byte[] music = new byte[(int) s.length() - mp3.getSize()];
-		s.seek(mp3.getSize());
+		byte[] music = new byte[(int) s.length() - (mp3.getSize() +10)];
+		s.seek(mp3.getSize() + 10);
 		s.read(music, 0, music.length);
- 		mp3.setFrames();
- 		RandomAccessFile sN = new RandomAccessFile(mp3.getPath() + "-2", "rw");
+ 		RandomAccessFile sN = new RandomAccessFile(mp3.getPath() + "-2.mp3", "rw");
  		// write ID3 version
  		sN.write("ID3".getBytes(ascii));
  		// write main and subversion

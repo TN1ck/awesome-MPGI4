@@ -88,7 +88,7 @@ class MP3File {
 	public int getCalculatedSize() {
 		int size = 0;
 		for(Frame f : this.frames){
-			size += f.getSize();
+			size += f.getSize() + 10;
 		}
 		return size;
 	}
@@ -129,15 +129,18 @@ class MP3File {
 			else if(f.getID().equals("TIT2")){
 				System.out.println(f.getBody().length);
 				f.setBody(this.song.getBytes(utf16charset));
+				f.setEncodingflag((byte) 1);
 			} 
 			else if(f.getID().equals("TALB")){
 				f.setBody(this.album.getBytes(utf16charset));
+				f.setEncodingflag((byte) 1);
 			}
 			else if(f.getID().equals("TYER")){
 				f.setBody(this.year.getBytes());
 			}
 			else if(f.getID().equals("TPE1")){
 				f.setBody(this.artist.getBytes(utf16charset));
+				f.setEncodingflag((byte) 1);
 			}
 		}
 	}
@@ -175,6 +178,7 @@ class Frame {
 	Charset utf16charset= Charset.forName("UTF-16");
 	Charset iso88591charset = Charset.forName("ISO-8859-1");
 	Charset utf8charset = Charset.forName("UTF-8");
+	Charset ascii = Charset.forName("ASCII");
 	
 	
 	private String ID;
@@ -264,7 +268,8 @@ class Frame {
 
 	public int getSize(){
 		if(this.ID.equals("APIC")){
-			return body.length + MIMEType.length() + imageDescription.getBytes(utf16charset).length + body.length;
+			// Encoding flg + 2 eofs
+			return body.length +  1 + MIMEType.getBytes(ascii).length + 1 + pictureType.length + imageDescription.getBytes(utf16charset).length + 1;
 		} else {
 			// beware of the encoding flag!
 			return body.length +1;

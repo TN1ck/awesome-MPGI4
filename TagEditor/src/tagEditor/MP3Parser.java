@@ -97,6 +97,7 @@ public class MP3Parser {
 							temp += new String(new byte[]{b});
 							size2++;
 					} f.setMIMEType(temp);
+					size2++;
 					byte[] tempByte = new byte[1];
 					s.read(tempByte);
 					f.setPictureType(tempByte);
@@ -106,7 +107,9 @@ public class MP3Parser {
 						temp += new String(new byte[]{b});
 						size2++;
 					} f.setImageDescription(temp);
-					f.setBody(new byte[currentFrameSize - (size2 +2)]);
+					size2++;
+					System.out.println(currentFrameSize - (size2));
+					f.setBody(new byte[currentFrameSize - (size2)]);
 					
 				}
 				else{
