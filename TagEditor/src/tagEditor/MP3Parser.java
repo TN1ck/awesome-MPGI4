@@ -82,39 +82,40 @@ public class MP3Parser {
 				s.seek(s.getFilePointer() - 1); // reset fp from previous check
 				
 				Frame f = new Frame();
-				
 				byte[] temp2 = new byte[4];
 				s.read(temp2);
-				f.ID = new String(temp2);
-				if(!f.ID.matches("\\w{4}"))
-					break;
-				f.size = s.readInt();
-				f.flags = s.readShort();
-				if(f.ID.equals("APIC")) {
+				f.setID(new String(temp2));
+				System.out.println(f.getID());
+				int currentFrameSize = s.readInt();
+				f.setFlags(s.readShort());
+				if(f.getID().equals("APIC")) {
 					int size2 = 0;
-					f.encodingflag = s.readByte();
+					f.setEncodingflag(s.readByte());
 					size2++;
+					String temp = new String();
 					for(byte b = s.readByte();0x00 != b;b = s.readByte()){
-							f.MIMEType += new String(new byte[]{b});
+							temp += new String(new byte[]{b});
 							size2++;
-					}			
-					s.read(f.pictureType);
+					} f.setMIMEType(temp);
+					byte[] tempByte = new byte[1];
+					s.read(tempByte);
+					f.setPictureType(tempByte);
 					size2++;
+					temp = "";
 					for(byte b = s.readByte();0x00 != b;b = s.readByte()){
-						f.imageDescription += new String(new byte[]{b});
+						temp += new String(new byte[]{b});
 						size2++;
-					}
-					System.out.println(f.imageDescription);
-					f.body = new byte[f.size - (size2 +2)];
+					} f.setImageDescription(temp);
+					f.setBody(new byte[currentFrameSize - (size2 +2)]);
 					
 				}
 				else{
-					f.encodingflag = s.readByte();
-					if(f.size > 1)
-						f.body = new byte[f.size -1];
+					f.setEncodingflag(s.readByte());
+					if(currentFrameSize > 1)
+						f.setBody(new byte[currentFrameSize -1]);
 				}
-				if(f.body != null)
-					s.read(f.body);
+				if(f.getBody() != null)
+					s.read(f.getBody());
 				
 				frames.add(f);
 			}
@@ -139,7 +140,7 @@ public class MP3Parser {
 	public String getArtist(	ArrayList<Frame> frames){
 		for(Frame f : frames)
 		{
-			if(f.ID.equals("TPE1"))
+			if(f.getID().equals("TPE1"))
 				return f.toString();
 		}
 		
@@ -153,7 +154,7 @@ public class MP3Parser {
 	public String getAlbum(	ArrayList<Frame> frames){
 		for(Frame f : frames)
 		{
-			if(f.ID.equals("TALB"))
+			if(f.getID().equals("TALB"))
 				return f.toString();
 		}
 		
@@ -167,7 +168,7 @@ public class MP3Parser {
 	public String getSong(	ArrayList<Frame> frames){
 		for(Frame f : frames)
 		{
-			if(f.ID.equals("TIT2"))
+			if(f.getID().equals("TIT2"))
 				return f.toString();
 		}
 		
@@ -181,7 +182,7 @@ public class MP3Parser {
 	public String getYear(ArrayList<Frame> frames){
 		for(Frame f : frames)
 		{
-			if(f.ID.equals("TYER"))
+			if(f.getID().equals("TYER"))
 				return f.toString();
 		}
 		
@@ -195,8 +196,8 @@ public class MP3Parser {
 	public byte[] getCover(	ArrayList<Frame> frames){
 		for(Frame f : frames)
 		{
-			if(f.ID.equals("APIC"))
-				return f.body;
+			if(f.getID().equals("APIC"))
+				return f.getBody();
 		}
 		
 		return null;
@@ -210,7 +211,8 @@ public class MP3Parser {
 		MP3Parser TestParser = new MP3Parser();
 		MP3File mp3 = new MP3File();
 		try {
-			mp3 = TestParser.readMP3(Paths.get("/Users/Tom/Dropbox/3 Semester/MPGI 4/The Whind Whistles/Animals are people too/01_Turtle.mp3"));
+			mp3 = TestParser.readMP3(Paths.get("/home/tom/Dropbox/3 Semester/MPGI 4/The Whind Whistles/Animals are people too/01_Turtle.mp3"));
+			mp3.setPath("/home/tom/Dropbox/3 Semester/MPGI 4/The Whind Whistles/Animals are people too/01_Turtle.mp3");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -219,6 +221,14 @@ public class MP3Parser {
 		System.out.println(mp3.getSong());
 		System.out.println(mp3.getArtist());
 		System.out.println(mp3.getYear());
+		mp3.setSong("oeueu");
+		MP3Saver testSaver = new MP3Saver();
+		try {
+			testSaver.saveMP3(mp3);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

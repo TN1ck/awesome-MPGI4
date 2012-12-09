@@ -46,6 +46,8 @@ public class Control {
 	private View GUI;
 	private MP3File currentMP3;
 	private DefaultMutableTreeNode tree;
+	private MP3Saver saver;
+	private MP3Parser parser;
 
 	/**
 	 * Constructor-method of the control. Will fill the tree when called.
@@ -55,6 +57,8 @@ public class Control {
 		GUI.getJmiSave().addActionListener(new SaveListener());
 		GUI.getInformationArea().addMouseListener(new MouseSaveListener());
 		GUI.getJmiOpen().addActionListener(new FileChooserListener());
+		this.saver = new MP3Saver();
+		this.parser = new MP3Parser();
 	}
 
 	/**
@@ -80,7 +84,6 @@ public class Control {
 		private PathMatcher pathMatcher;
 		private DefaultMutableTreeNode currentDirectory;
 		private DefaultMutableTreeNode mp3File;
-		private MP3Parser Parser = new MP3Parser();
 		private MP3File mp3;
 		private Directory directory;
 		
@@ -90,7 +93,9 @@ public class Control {
 				System.out.println("FILE:" + filePath);
 				mp3 = new MP3File();
 				try {
-					mp3 = Parser.readMP3(filePath);
+					mp3 = parser.readMP3(filePath);
+					mp3.setPath(filePath.toString());
+					System.out.println(filePath.toString());
 				} catch (IOException e) {
 					return FileVisitResult.CONTINUE;
 				}
@@ -239,7 +244,14 @@ public class Control {
 					currentMP3.setArtist(GUI.getArtist().getText());
 					currentMP3.setYear(GUI.getYear().getText());
 					currentMP3.setSong(GUI.getSong().getText());
+					try {
+						saver.saveMP3(currentMP3);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					GUI.getTree().updateUI();
+					
 				}
 			}
 	
@@ -252,6 +264,12 @@ public class Control {
 				currentMP3.setArtist(GUI.getArtist().getText());
 				currentMP3.setYear(GUI.getYear().getText());
 				currentMP3.setSong(GUI.getSong().getText());
+				try {
+					saver.saveMP3(currentMP3);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				GUI.getTree().updateUI();
 			}
 		}

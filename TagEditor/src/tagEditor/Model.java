@@ -2,6 +2,7 @@ package tagEditor;
 
 
 import java.awt.image.BufferedImage;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 import javax.swing.JTree;
@@ -14,10 +15,15 @@ import javax.swing.event.TreeSelectionListener;
 /** This class represents a MP3-File*/
 class MP3File {
 	
+	Charset utf16charset= Charset.forName("UTF-16");
+	Charset iso88591charset = Charset.forName("ISO-8859-1");
+	Charset utf8charset = Charset.forName("UTF-8");
+	
 	private String artist;
 	private String song;
 	private String album;
 	private String year;
+	private String path;
 	private int size;
 	private ArrayList<Frame> frames;
 	private byte[] cover;
@@ -70,9 +76,27 @@ class MP3File {
 		this.size = size;
 	}
 	public int getSize() {
+		return this.size;
+	}
+	public void setPath(String path) {
+		this.path = path;
+	}
+	public String getPath() {
+		return path;
+	}
+	
+	public int getCalculatedSize() {
+		int size = 0;
+		for(Frame f : this.frames){
+			size += f.getSize();
+		}
 		return size;
 	}
-
+	
+	public ArrayList<Frame> getFrames() {
+		return frames;
+	}
+	
 	/**
 	 * Constructor-Method for creating the meta-info of a mp3-file
 	 * 
@@ -90,10 +114,32 @@ class MP3File {
 		this.cover = cover;
 		this.frames = frames;
 		this.size = size;
+		this.path = path;
 	}
 	
 	public MP3File(){
 		
+	}
+	
+	public void setFrames(){
+		for(Frame f: frames){
+			if(f.getID().equals("APIC")){
+				f.setBody(this.cover);
+			}
+			else if(f.getID().equals("TIT2")){
+				System.out.println(f.getBody().length);
+				f.setBody(this.song.getBytes(utf16charset));
+			} 
+			else if(f.getID().equals("TALB")){
+				f.setBody(this.album.getBytes(utf16charset));
+			}
+			else if(f.getID().equals("TYER")){
+				f.setBody(this.year.getBytes());
+			}
+			else if(f.getID().equals("TPE1")){
+				f.setBody(this.artist.getBytes(utf16charset));
+			}
+		}
 	}
 	
 	/**String representation of the file, needed for the Tree-UI
@@ -126,22 +172,25 @@ class Directory {
 
 
 class Frame {
-	public String ID;
-	public int size;
-	public byte[] body;
-	public short flags;
-	public byte encodingflag;
+	Charset utf16charset= Charset.forName("UTF-16");
+	Charset iso88591charset = Charset.forName("ISO-8859-1");
+	Charset utf8charset = Charset.forName("UTF-8");
 	
-	public String MIMEType;
-	public String imageDescription;
-	public byte[] pictureType;
+	
+	private String ID;
+	private byte[] body;
+	private short flags;
+	private byte encodingflag;
+	
+	private String MIMEType;
+	private String imageDescription;
+	private byte[] pictureType;
 	
 	public Frame(){
 		this.MIMEType = new String();
 		this.pictureType = new byte[1];
 		this.imageDescription = new String();
 	}
-
 	
 	public String toString() {
 		try {
@@ -154,6 +203,71 @@ class Frame {
 		}
 		catch(Exception e) {
 			return "Unsupported charset! " + e.toString();
+		}
+	}
+	
+	public String getID() {
+		return ID;
+	}
+
+	public byte[] getBody() {
+		return body;
+	}
+
+	public short getFlags() {
+		return flags;
+	}
+
+	public byte getEncodingflag() {
+		return encodingflag;
+	}
+
+	public String getMIMEType() {
+		return MIMEType;
+	}
+
+	public String getImageDescription() {
+		return imageDescription;
+	}
+
+	public byte[] getPictureType() {
+		return pictureType;
+	}
+
+	public void setID(String iD) {
+		ID = iD;
+	}
+
+	public void setBody(byte[] body) {
+		this.body = body;
+	}
+
+	public void setFlags(short flags) {
+		this.flags = flags;
+	}
+
+	public void setEncodingflag(byte encodingflag) {
+		this.encodingflag = encodingflag;
+	}
+
+	public void setMIMEType(String mIMEType) {
+		MIMEType = mIMEType;
+	}
+
+	public void setImageDescription(String imageDescription) {
+		this.imageDescription = imageDescription;
+	}
+
+	public void setPictureType(byte[] pictureType) {
+		this.pictureType = pictureType;
+	}
+
+	public int getSize(){
+		if(this.ID.equals("APIC")){
+			return body.length + MIMEType.length() + imageDescription.getBytes(utf16charset).length + body.length;
+		} else {
+			// beware of the encoding flag!
+			return body.length +1;
 		}
 	}
 }
