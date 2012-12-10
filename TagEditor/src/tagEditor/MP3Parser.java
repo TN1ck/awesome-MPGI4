@@ -105,8 +105,6 @@ public class MP3Parser {
 					position++; // the 0x00 byte
 					
 					f.setBody(new byte[currentFrameSize - (position)]);
-					if( f.getBody().length + 1 + f.getMIMEType().length() + 1 + f.getPictureType().length + f.getImageDescription().length() + 1 != currentFrameSize)
-						System.out.println("wtf");
 				}
 				else{
 					f.setEncodingflag(s.readByte());
