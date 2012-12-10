@@ -62,7 +62,7 @@ public class Control {
 	}
 
 	/**
-	 * Method to fill the tree, just for testing atm
+	 * All files with .mp3 will be parsed, and if they are correct MP3 Files transferred into the tree
 	 * 
 	 */
 	
@@ -79,7 +79,7 @@ public class Control {
 		
 		
 	}
-	
+
 	private class MP3_FileVisitor extends SimpleFileVisitor<Path>{
 		private PathMatcher pathMatcher;
 		private DefaultMutableTreeNode currentDirectory;
@@ -95,7 +95,6 @@ public class Control {
 				try {
 					mp3 = parser.readMP3(filePath);
 					mp3.setPath(filePath.toString());
-					System.out.println(filePath.toString());
 				} catch (IOException e) {
 					return FileVisitResult.CONTINUE;
 				}
@@ -132,26 +131,23 @@ public class Control {
 		
 		@Override
 		public FileVisitResult postVisitDirectory(Path directoryPath,IOException exc){
+			DefaultMutableTreeNode tempDirectory = currentDirectory;
 			currentDirectory = (DefaultMutableTreeNode) currentDirectory.getParent();
+			if(tempDirectory.getChildCount() == 0){
+				tempDirectory.removeFromParent();
+			}
 			return FileVisitResult.CONTINUE;
 		}
 		
 	}
-
-	private BufferedImage bytesToPicture(byte[] picture) {
-		BufferedImage returnPicture = null;
-		try {
-			returnPicture = ImageIO.read(new ByteArrayInputStream(picture));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return returnPicture;
-	}
-
+	
+	/**
+	 *  Will wrap the DefaultMutableTree into a JTree and adds all the listener.
+	 * @return
+	 */
 	public JTree getTree() {
 		// Initialize the tree
 		JTree DataTree = new JTree(this.tree);
-		DataTree.setCellRenderer(new CustomIconRenderer());
 		DataTree.getSelectionModel().setSelectionMode(
 				TreeSelectionModel.SINGLE_TREE_SELECTION);
 		// Listeners are strange...
@@ -208,17 +204,19 @@ public class Control {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		// Create a new Window
-		Control demoControl = new Control();
-
+		Control mainProgram = new Control();
 		// Show window
-		demoControl.getGUI().setVisible(true);
-
+		mainProgram.getGUI().setVisible(true);
 		// Exit program, if window is closed
-		demoControl.getGUI().setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainProgram.getGUI().setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 	}
+	/**
+	 * FileChooseListener for choosing the directory to be parsed
+	 *
+	 *
+	 */
 	private class FileChooserListener implements ActionListener {
 		 public void actionPerformed(ActionEvent actionEvent) {
 		        JFileChooser theFileChooser = new JFileChooser(".");
@@ -226,7 +224,6 @@ public class Control {
 		        int returnval = theFileChooser.showOpenDialog(null);
 		        if (returnval == JFileChooser.APPROVE_OPTION) {
 		          File selectedFile = theFileChooser.getSelectedFile();
-		          System.out.println(selectedFile.getPath());
 		          fillTree(selectedFile.getPath());
 		        } 
 		      }
@@ -292,25 +289,4 @@ public class Control {
 	
 }
 
-class CustomIconRenderer extends DefaultTreeCellRenderer {
-	Icon mp3Icon;
-	Icon directoryIcon;
-	public CustomIconRenderer() {
-		mp3Icon = new DefaultTreeCellRenderer().getDefaultLeafIcon();
-		directoryIcon = new DefaultTreeCellRenderer().getDefaultClosedIcon();
-	}
-	public Component getTreeCellRendererComponent(JTree tree,
-	Object value,boolean sel,boolean expanded,boolean leaf,
-	int row,boolean hasFocus) {
-		super.getTreeCellRendererComponent(tree, value, sel,expanded, leaf, row, hasFocus);
-		Object nodeObj = ((DefaultMutableTreeNode)value).getUserObject();
-		// check whatever you need to on the node user object
-		if (nodeObj instanceof Directory) {
-			setIcon(directoryIcon);
-		} else {
-			setIcon(mp3Icon);
-		}
-		return this;
-	}
-}
 

@@ -27,15 +27,6 @@ public class MP3Parser {
 		return (bytes[3] & 0xFF) | ((bytes[2] & 0xFF) << 7 ) | ((bytes[1] & 0xFF) << 14 ) | ((bytes[0] & 0xFF) << 21 );
 	}
 	
-	private int FrameToInt(byte[] bytes){
-		return 10+(bytes[3] & 0xFF) | ((bytes[2] & 0xFF) << 8 ) | ((bytes[1] & 0xFF) << 16 ) | ((bytes[0] & 0xFF) << 24 );
-		
-	}
-	
-	public MP3Parser(){
-			
-	}
-	
 	public MP3File readMP3(Path filePath) throws IOException{
 		s = new RandomAccessFile(filePath.toString(), "r");	
 		byte[] temp = new byte[3];
@@ -79,37 +70,41 @@ public class MP3Parser {
 		ArrayList<Frame> frames = new ArrayList<Frame>();
 		while(s.getFilePointer() < size){
 			if(s.readByte() != 0x00) {// check if valid frame or NULL area
-				s.seek(s.getFilePointer() - 1); // reset fp from previous check
-				
+				s.seek(s.getFilePointer() - 1); // reset fp from previous check	
 				Frame f = new Frame();
+				//read the FrameID
 				byte[] temp2 = new byte[4];
 				s.read(temp2);
 				f.setID(new String(temp2));
-				System.out.println(f.getID());
-				int currentFrameSize = s.readInt();
-				f.setFlags(s.readShort());
+				
+				int currentFrameSize = s.readInt(); // read the frame-size
+				f.setFlags(s.readShort()); // read and set the flags, should throw an exception when it's not 0
 				if(f.getID().equals("APIC")) {
-					int size2 = 0;
-					f.setEncodingflag(s.readByte());
-					size2++;
+					int position = 0; // needed to determine how big the picture is
+					f.setEncodingflag(s.readByte()); // read encoding-flag
+					position++;
+					// read MIME-Type
 					String temp = new String();
 					for(byte b = s.readByte();0x00 != b;b = s.readByte()){
 							temp += new String(new byte[]{b});
-							size2++;
+							position++;
 					} f.setMIMEType(temp);
-					size2++;
+					position++; // the 0x00 byte
+					
 					byte[] tempByte = new byte[1];
 					s.read(tempByte);
 					f.setPictureType(tempByte);
-					size2++;
+					position++;
+					
+					//read picture-description
 					temp = "";
 					for(byte b = s.readByte();0x00 != b;b = s.readByte()){
 						temp += new String(new byte[]{b});
-						size2++;
+						position++;
 					} f.setImageDescription(temp);
-					size2++;
-					System.out.println(currentFrameSize - (size2));
-					f.setBody(new byte[currentFrameSize - (size2)]);
+					position++; // the 0x00 byte
+					
+					f.setBody(new byte[currentFrameSize - (position)]);
 					if( f.getBody().length + 1 + f.getMIMEType().length() + 1 + f.getPictureType().length + f.getImageDescription().length() + 1 != currentFrameSize)
 						System.out.println("wtf");
 				}
@@ -205,34 +200,6 @@ public class MP3Parser {
 		}
 		
 		return null;
-	}
-
-
-	
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		
-		MP3Parser TestParser = new MP3Parser();
-		MP3File mp3 = new MP3File();
-		try {
-			mp3 = TestParser.readMP3(Paths.get("/home/tom/Dropbox/3 Semester/MPGI 4/The Whind Whistles/Animals are people too/01_Turtle.mp3"));
-			mp3.setPath("/home/tom/Dropbox/3 Semester/MPGI 4/The Whind Whistles/Animals are people too/01_Turtle.mp3");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println(mp3.getAlbum());
-		System.out.println(mp3.getSong());
-		System.out.println(mp3.getArtist());
-		System.out.println(mp3.getYear());
-		mp3.setSong("oeueu");
-		MP3Saver testSaver = new MP3Saver();
-		try {
-			testSaver.saveMP3(mp3);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 }
