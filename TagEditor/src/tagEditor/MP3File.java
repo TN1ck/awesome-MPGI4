@@ -1,6 +1,7 @@
 package tagEditor;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -144,6 +145,6 @@ class MP3File {
 	 */
 	
 	public String toString(){
-		return artist + " - " + song;
+		return new File(path).getName();
 	}
 }
