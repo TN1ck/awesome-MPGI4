@@ -1,7 +1,14 @@
 package tagEditor;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Iterator;
+
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 
 /** This class represents a MP3-File*/
 class MP3File {
@@ -16,6 +23,7 @@ class MP3File {
 	private String album;
 	private String year;
 	private String path;
+	private String pictureMIME;
 	//needed to read the music
 	private int tagSize;
 	private ArrayList<Frame> frames;
@@ -77,7 +85,12 @@ class MP3File {
 	public String getPath() {
 		return path;
 	}
-	
+	public void setPictureMIME(String pictureMIME) {
+		this.pictureMIME = pictureMIME;
+	}
+	public String getPictureMIME() {
+		return pictureMIME;
+	}
 	/**
 	 * 
 	 * @return the current size of the MP3, needed for saving
@@ -97,10 +110,13 @@ class MP3File {
 	/**
 	 * Overwrites the content of the frames with the variables of the current MP3File, should be done before saving
 	 */
-	public void setFrames(){
+	public void setFrames() throws IOException{
 		for(Frame f: frames){
 			if(f.getID().equals("APIC")){
 				f.setBody(this.cover);
+				//f.setEncodingflag((byte) 1);
+				if(this.pictureMIME != null)
+					f.setMIMEType(this.pictureMIME.getBytes());
 			}
 			else if(f.getID().equals("TIT2")){
 				System.out.println(f.getBody().length);

@@ -38,6 +38,7 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import javax.activation.MimetypesFileTypeMap;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.MemoryCacheImageInputStream;
 
@@ -255,6 +256,10 @@ public class Control {
 				ImageIcon newImage = new ImageIcon(currentMP3.getCover());
 				GUI.getCover().setIcon(new ImageIcon(newImage.getImage().getScaledInstance(250,250,java.awt.Image.SCALE_SMOOTH)));
 				GUI.getCover().updateUI();
+				MimetypesFileTypeMap mtftp = new MimetypesFileTypeMap();
+				mtftp.addMimeTypes("png jpg jpeg");
+				currentMP3.setPictureMIME("image/" + mtftp.getContentType(selectedFile));
+				System.out.println(currentMP3.getPictureMIME());
 	          
 	        } 
 	      }
