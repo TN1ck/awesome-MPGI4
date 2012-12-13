@@ -23,15 +23,11 @@ class Frame {
 	private short flags;
 	private byte encodingflag;
 	
-	private String MIMEType;
-	private String imageDescription;
-	private byte[] pictureType;
+	private byte[] MIMEType;
+	private byte[] imageDescription;
+	private byte pictureType;
 	
-	public Frame(){
-		this.MIMEType = new String();
-		this.pictureType = new byte[1];
-		this.imageDescription = new String();
-	}
+
 	/**
 	 * Will return the body of the frame according to the encoding-flag. Shouldn't be used for non-text-based frames.
 	 */
@@ -65,15 +61,15 @@ class Frame {
 		return encodingflag;
 	}
 
-	public String getMIMEType() {
+	public byte[] getMIMEType() {
 		return MIMEType;
 	}
 
-	public String getImageDescription() {
+	public byte[] getImageDescription() {
 		return imageDescription;
 	}
 
-	public byte[] getPictureType() {
+	public byte getPictureType() {
 		return pictureType;
 	}
 
@@ -93,15 +89,15 @@ class Frame {
 		this.encodingflag = encodingflag;
 	}
 
-	public void setMIMEType(String mIMEType) {
+	public void setMIMEType(byte[] mIMEType) {
 		MIMEType = mIMEType;
 	}
 
-	public void setImageDescription(String imageDescription) {
+	public void setImageDescription(byte[] imageDescription) {
 		this.imageDescription = imageDescription;
 	}
 
-	public void setPictureType(byte[] pictureType) {
+	public void setPictureType(byte pictureType) {
 		this.pictureType = pictureType;
 	}
 	
@@ -112,7 +108,7 @@ class Frame {
 	public int getSize(){
 		if(this.ID.equals("APIC")){
 			// Encoding flg + 2 eofs
-			return 1 + MIMEType.length() + 1 + pictureType.length + imageDescription.length() + 1 + body.length;
+			return 1 + MIMEType.length + 1 + 1 + imageDescription.length + 1 + body.length;
 		} else {
 			// beware of the encoding flag!
 			return body.length +1;

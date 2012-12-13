@@ -37,10 +37,10 @@ public class MP3Saver {
  			sN.writeShort(f.getFlags()); // write flags
  			sN.write(f.getEncodingflag()); // write the encoding of the text
  			if(f.getID().equals("APIC")){
- 				sN.write(f.getMIMEType().getBytes(ascii)); // write MIME-type (image/jpg or image/png)
+ 				sN.write(f.getMIMEType()); // write MIME-type (image/jpg or image/png)
  				sN.write(new byte[]{0}); // EOF
  				sN.write(f.getPictureType()); // specifies if the picture is an cover or something else
- 				sN.write(f.getImageDescription().getBytes(ascii)); // write the image description
+ 				sN.write(f.getImageDescription()); // write the image description
  				sN.write(new byte[]{0}); // EOF
  			}
  			sN.write(f.getBody());

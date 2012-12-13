@@ -19,16 +19,15 @@ public class MP3Parser {
 	Charset iso88591charset = Charset.forName("ISO-8859-1");
 	Charset utf8charset = Charset.forName("UTF-8");
 	
-	private RandomAccessFile s;
+	private MyRandomAccessFile s;
 
 	
 	private int TagToInt(byte[] bytes){
-	
 		return (bytes[3] & 0xFF) | ((bytes[2] & 0xFF) << 7 ) | ((bytes[1] & 0xFF) << 14 ) | ((bytes[0] & 0xFF) << 21 );
 	}
 	
 	public MP3File readMP3(Path filePath) throws IOException{
-		s = new RandomAccessFile(filePath.toString(), "r");	
+		s = new MyRandomAccessFile(filePath.toString(), "r");	
 		byte[] temp = new byte[3];
 		s.read(temp);
 		String IDString = new String(temp);
@@ -67,60 +66,45 @@ public class MP3Parser {
 	
 	private ArrayList<Frame> parseFrames(int size) throws IOException
 	{
+		int currentFrameSize;
+		long position;
+		
 		ArrayList<Frame> frames = new ArrayList<Frame>();
 		while(s.getFilePointer() < size){
 			if(s.readByte() != 0x00) {// check if valid frame or NULL area
 				s.seek(s.getFilePointer() - 1); // reset fp from previous check	
 				Frame f = new Frame();
 				//read the FrameID
-				byte[] temp2 = new byte[4];
-				s.read(temp2);
-				f.setID(new String(temp2));
-				
-				int currentFrameSize = s.readInt(); // read the frame-size
+				f.setID(s.readString(4));
+				currentFrameSize = s.readInt(); // read the frame-size
 				f.setFlags(s.readShort()); // read and set the flags, should throw an exception when it's not 0
+				position = s.getFilePointer();
+				f.setEncodingflag(s.readByte()); // read encoding-flag
 				if(f.getID().equals("APIC")) {
-					int position = 0; // needed to determine how big the picture is
-					f.setEncodingflag(s.readByte()); // read encoding-flag
-					position++;
+					// Do we have flags? If so, break
+					if(f.getEncodingflag() != 0){
+						s.seek(s.getFilePointer() + currentFrameSize -1);
+						break;
+					}
 					// read MIME-Type
-					String temp = new String();
-					for(byte b = s.readByte();0x00 != b;b = s.readByte()){
-							temp += new String(new byte[]{b});
-							position++;
-					} f.setMIMEType(temp);
-					position++; // the 0x00 byte
-					
-					byte[] tempByte = new byte[1];
-					s.read(tempByte);
-					f.setPictureType(tempByte);
-					position++;
-					
+					f.setMIMEType(s.readEOFString());
+					//read picture-type
+					f.setPictureType(s.readByte());
 					//read picture-description
-					temp = "";
-					for(byte b = s.readByte();0x00 != b;b = s.readByte()){
-						temp += new String(new byte[]{b});
-						position++;
-					} f.setImageDescription(temp);
-					position++; // the 0x00 byte
-					
-					f.setBody(new byte[currentFrameSize - (position)]);
+					f.setImageDescription(s.readEOFString());
+					//read body
+					f.setBody(new byte[currentFrameSize - (int) (s.getFilePointer() - position)]);
 				}
 				else{
-					f.setEncodingflag(s.readByte());
-					if(currentFrameSize > 1)
-						f.setBody(new byte[currentFrameSize -1]);
+					f.setBody(new byte[currentFrameSize -1]);
 				}
-				if(f.getBody() != null)
-					s.read(f.getBody());
-				
+				s.read(f.getBody());
 				frames.add(f);
 			}
 		}
 		return frames;
 	}
 	
-
 	
 	/**
 	 * Get parsed frame objects.
