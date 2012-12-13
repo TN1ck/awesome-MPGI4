@@ -43,12 +43,13 @@ public class MP3Parser {
 					s.read(id3Size);			
 					mp3.setSize(TagToInt(id3Size));
 					ArrayList<Frame> frames = parseFrames(mp3.getSize());
-					mp3.setFrames(frames);
 					mp3.setAlbum(getAlbum(frames));
 					mp3.setArtist(getArtist(frames));
 					mp3.setCover(getCover(frames));
 					mp3.setSong(getSong(frames));
 					mp3.setYear(getYear(frames));
+					//important!
+					mp3.setFrames(frames);
 				} 
 				else
 					throw(new IOException("ID3 flags are set!"));
@@ -125,7 +126,13 @@ public class MP3Parser {
 				return f.toString();
 		}
 		
-		return "";
+		Frame f = new Frame();
+		f.setBody("".getBytes());
+		f.setFlags((short)0);
+		f.setEncodingflag((byte) 1);
+		f.setID("TPE1");
+		frames.add(f);
+		return f.toString();
 	}
 	
 	/**
@@ -139,7 +146,13 @@ public class MP3Parser {
 				return f.toString();
 		}
 		
-		return "";
+		Frame f = new Frame();
+		f.setBody("".getBytes());
+		f.setFlags((short)0);
+		f.setEncodingflag((byte) 1);
+		f.setID("TALB");
+		frames.add(f);
+		return f.toString();
 	}
 	
 	/**
@@ -152,8 +165,14 @@ public class MP3Parser {
 			if(f.getID().equals("TIT2"))
 				return f.toString();
 		}
-		
-		return "";
+		//No frame found!
+		Frame f = new Frame();
+		f.setBody("".getBytes());
+		f.setEncodingflag((byte) 1);
+		f.setFlags((short)0);
+		f.setID("TIT2");
+		frames.add(f);
+		return f.toString();
 	}
 	
 	/**
@@ -167,7 +186,14 @@ public class MP3Parser {
 				return f.toString();
 		}
 		
-		return "";
+		//No frame found!
+		Frame f = new Frame();
+		f.setBody("".getBytes());
+		f.setEncodingflag((byte) 1);
+		f.setFlags((short)0);
+		f.setID("TYER");
+		frames.add(f);
+		return f.toString();
 	}
 	
 	/**
@@ -181,7 +207,15 @@ public class MP3Parser {
 				return f.getBody();
 		}
 		
-		return null;
+		Frame f = new Frame();
+		f.setBody("".getBytes());
+		f.setFlags((short)0);
+		f.setEncodingflag((byte) 1);
+		f.setImageDescription("".getBytes());
+		f.setMIMEType("image/jpg".getBytes());
+		f.setID("APIC");
+		frames.add(f);
+		return f.getBody();
 	}
 
 }

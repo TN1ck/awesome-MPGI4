@@ -9,6 +9,7 @@ class MP3File {
 	Charset utf16charset= Charset.forName("UTF-16");
 	Charset iso88591charset = Charset.forName("ISO-8859-1");
 	Charset utf8charset = Charset.forName("UTF-8");
+	Charset ascii = Charset.forName("ASCII");
 	
 	private String artist;
 	private String song;
@@ -111,7 +112,8 @@ class MP3File {
 				f.setEncodingflag((byte) 1);
 			}
 			else if(f.getID().equals("TYER")){
-				f.setBody(this.year.getBytes());
+				f.setBody(this.year.getBytes(utf16charset));
+				f.setEncodingflag((byte) 1);
 			}
 			else if(f.getID().equals("TPE1")){
 				f.setBody(this.artist.getBytes(utf16charset));
