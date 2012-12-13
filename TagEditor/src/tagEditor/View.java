@@ -95,6 +95,10 @@ public class View extends JFrame {
 	public JTree getTree() {
 		return tree;
 	}
+	
+	public JButton getEditCover() {
+		return editCover;
+	}
 
 	/**
 	 * Constructor-Method of the View, will initialize the UI elements, sets the

@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -14,6 +15,8 @@ import javax.swing.JFrame;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -21,7 +24,10 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeSelectionModel;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
@@ -57,6 +63,7 @@ public class Control {
 		GUI.getJmiSave().addActionListener(new SaveListener());
 		GUI.getInformationArea().addMouseListener(new MouseSaveListener());
 		GUI.getJmiOpen().addActionListener(new FileChooserListener());
+		GUI.getEditCover().addActionListener(new PictureFileChooserListener());
 		this.saver = new MP3Saver();
 		this.parser = new MP3Parser();
 	}
@@ -230,6 +237,29 @@ public class Control {
 		 
 	}
 	
+	private class PictureFileChooserListener implements ActionListener {
+		public void actionPerformed(ActionEvent actionEvent) {
+	        JFileChooser theFileChooser = new JFileChooser(".");
+	        theFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+	        FileFilter filter = new FileNameExtensionFilter("Image file", "jpg", "jpeg","png");
+	        theFileChooser.setFileFilter(filter);
+	        int returnval = theFileChooser.showOpenDialog(null);
+	        if (returnval == JFileChooser.APPROVE_OPTION) {
+	          File selectedFile = theFileChooser.getSelectedFile();
+	          try {
+				currentMP3.setCover(loadFileFromPersistentStore(selectedFile));
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+				ImageIcon newImage = new ImageIcon(currentMP3.getCover());
+				GUI.getCover().setIcon(new ImageIcon(newImage.getImage().getScaledInstance(250,250,java.awt.Image.SCALE_SMOOTH)));
+				GUI.getCover().updateUI();
+	          
+	        } 
+	      }
+	}
+	
 	private class SaveListener implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
 			// TODO Auto-generated method stub
@@ -247,8 +277,6 @@ public class Control {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					GUI.getTree().updateUI();
-					
 				}
 			}
 	
@@ -285,6 +313,14 @@ public class Control {
 		}
 
 	}
+	
+	 private byte[] loadFileFromPersistentStore(File file) throws Exception, FileNotFoundException {
+		 FileInputStream fileInputStream = new FileInputStream(file);
+	     byte[] data = new byte[(int) file.length()];
+	     fileInputStream.read(data);
+	     fileInputStream.close();
+	     return data;
+		 }
 	
 	
 }
