@@ -56,6 +56,7 @@ public class View extends JFrame {
 	private Container informationArea;
 	private JFileChooser fileChooser;
 	private JTree tree;
+	private JSplitPane splitPane;
 	
 	public JMenuItem getJmiOpen() {
 		return jmiOpen;
@@ -139,6 +140,8 @@ public class View extends JFrame {
 
 		// Add main menu
 		initMainMenu();
+		//visibility
+		this.setVisibilityOfInfoArea(false);
 
 		setLayout();
 
@@ -178,7 +181,7 @@ public class View extends JFrame {
 		c.gridy = 4;
 		informationArea.add(this.editCover, c);
 
-		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
 				this.treeView, informationArea);
 		splitPane.setOneTouchExpandable(true);
 		splitPane.setDividerLocation(300);
@@ -226,6 +229,19 @@ public class View extends JFrame {
 		mainMenu.add(helpMenu);
 
 		this.setJMenuBar(mainMenu);
+	}
+	
+	public void setVisibilityOfInfoArea(Boolean b){
+		this.song.setVisible(b);
+		this.songLabel.setVisible(b);
+		this.artist.setVisible(b);
+		this.artistLabel.setVisible(b);
+		this.year.setVisible(b);
+		this.yearLabel.setVisible(b);
+		this.album.setVisible(b);
+		this.albumLabel.setVisible(b);
+		this.cover.setVisible(b);
+		this.editCover.setVisible(b);
 	}
 
 

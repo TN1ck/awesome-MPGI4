@@ -184,6 +184,7 @@ public class Control {
 				currentMP3 = mp3;
 
 				// Update the UI
+				GUI.setVisibilityOfInfoArea(true);
 				GUI.getSong().setText(mp3.getSong());
 				GUI.getArtist().setText(mp3.getArtist());
 				GUI.getAlbum().setText(mp3.getAlbum());
@@ -198,11 +199,7 @@ public class Control {
 				}
 			} 
 			else{
-				GUI.getSong().setText("");
-				GUI.getArtist().setText("");
-				GUI.getAlbum().setText("");
-				GUI.getYear().setText("");
-				GUI.getCover().setIcon(new ImageIcon(Paths.get("./ressources/spaceholder.png").toString()));
+				GUI.setVisibilityOfInfoArea(false);
 			
 			}
 		}
