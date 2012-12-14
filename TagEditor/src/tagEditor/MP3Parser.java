@@ -83,7 +83,7 @@ public class MP3Parser {
 				f.setEncodingflag(s.readByte()); // read encoding-flag
 				if(f.getID().equals("APIC")) {
 					// Do we have flags? If so, break
-					if(f.getEncodingflag() != 0){
+					if(f.getFlags() != 0){
 						s.seek(s.getFilePointer() + currentFrameSize -1);
 						break;
 					}
@@ -93,12 +93,9 @@ public class MP3Parser {
 					f.setPictureType(s.readByte());
 					//read picture-description
 					f.setImageDescription(s.readEOFString());
-					//read body
-					f.setBody(new byte[currentFrameSize - (int) (s.getFilePointer() - position)]);
 				}
-				else{
-					f.setBody(new byte[currentFrameSize -1]);
-				}
+				//read body
+				f.setBody(new byte[currentFrameSize - (int) (s.getFilePointer() - position)]);
 				s.read(f.getBody());
 				frames.add(f);
 			}
@@ -208,7 +205,6 @@ public class MP3Parser {
 		}
 		
 		Frame f = new Frame();
-		f.setBody("".getBytes());
 		f.setFlags((short)0);
 		f.setEncodingflag((byte) 1);
 		f.setImageDescription("".getBytes());
