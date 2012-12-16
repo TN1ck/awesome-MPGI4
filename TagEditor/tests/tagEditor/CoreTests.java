@@ -60,7 +60,6 @@ public class CoreTests {
 			saver.saveMP3(myMp3);
 			myMp3 = parser.readMP3(Paths.get(myPath));
 			
-			
 			assertEquals("MPGI3", myMp3.getAlbum());
 			assertEquals("0815",myMp3.getYear());
 			assertEquals("Tom",myMp3.getArtist());

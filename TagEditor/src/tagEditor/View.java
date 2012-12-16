@@ -50,9 +50,9 @@ public class View extends JFrame {
 	private JScrollPane treeView;
 	// JLabel will have a ImageIcon inside to display the image
 	private JLabel cover;
-	private JMenuItem jmiSave;
-	private JMenuItem jmiOpen;
-	private JButton editCover;
+	protected JMenuItem jmiSave;
+	protected JMenuItem jmiOpen;
+	protected JButton editCover;
 	private Container informationArea;
 	private JFileChooser fileChooser;
 	private JTree tree;

@@ -143,10 +143,12 @@ public class Control {
 					currentDirectory = tempDirectory;
 				
 				} else {
+					
 					currentDirectory = tempDirectory;
 					TreeModel temp = new DefaultTreeModel(currentDirectory);
 					tree = new DefaultMutableTreeNode(temp);
 					GUI.getTree().setModel(temp);
+					
 				}
 				System.out.println("DIR: " + directoryPath);
 			}
@@ -186,6 +188,9 @@ public class Control {
 		DataTree.addTreeSelectionListener(new TreeListener());
 		return DataTree;
 
+	}
+	public DefaultMutableTreeNode getRawTreeNode() {
+		return tree;
 	}
 
 	public View getGUI() {
@@ -253,6 +258,7 @@ public class Control {
 	 * 
 	 */
 	private class FileChooserListener implements ActionListener {
+		
 		public void actionPerformed(ActionEvent actionEvent) {
 			JFileChooser theFileChooser = new JFileChooser(".");
 			theFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
