@@ -44,7 +44,10 @@ public class MP3Parser {
 					byte[] id3Size = new byte[4]; 
 					s.read(id3Size);			
 					mp3.setSize(TagToInt(id3Size));
+					
+					// we are reading in all the frames
 					ArrayList<Frame> frames = parseFrames(mp3.getSize());
+					
 					mp3.setAlbum(getAlbum(frames));
 					mp3.setArtist(getArtist(frames));
 					mp3.setCover(getCover(frames));
@@ -73,14 +76,19 @@ public class MP3Parser {
 		long position;
 		
 		ArrayList<Frame> frames = new ArrayList<Frame>();
+		
 		while(s.getFilePointer() < size){
+			
 			if(s.readByte() != 0x00) {// check if valid frame or NULL area
+			
 				s.seek(s.getFilePointer() - 1); // reset fp from previous check	
+				
 				Frame f = new Frame();
 				//read the FrameID
 				f.setID(s.readString(4));
 				currentFrameSize = s.readInt(); // read the frame-size
 				f.setFlags(s.readShort()); // read and set the flags, should throw an exception when it's not 0
+				
 				position = s.getFilePointer();
 				f.setEncodingflag(s.readByte()); // read encoding-flag
 				if(f.getID().equals("APIC")) {
@@ -96,9 +104,13 @@ public class MP3Parser {
 					//read picture-description
 					f.setImageDescription(s.readEOFString());
 				}
+				
 				//read body
 				f.setBody(new byte[currentFrameSize - (int) (s.getFilePointer() - position)]);
+				
+				// we are reading in the data
 				s.read(f.getBody());
+				
 				frames.add(f);
 			}
 		}
@@ -125,6 +137,8 @@ public class MP3Parser {
 				return f.toString();
 		}
 		
+		// we dont have the frame so we have to create it
+		
 		Frame f = new Frame();
 		f.setBody("".getBytes());
 		f.setFlags((short)0);
@@ -144,6 +158,8 @@ public class MP3Parser {
 			if(f.getID().equals("TALB"))
 				return f.toString();
 		}
+
+		// we dont have the frame so we have to create it
 		
 		Frame f = new Frame();
 		f.setBody("".getBytes());
@@ -164,7 +180,9 @@ public class MP3Parser {
 			if(f.getID().equals("TIT2"))
 				return f.toString();
 		}
-		//No frame found!
+
+		// we dont have the frame so we have to create it
+			
 		Frame f = new Frame();
 		f.setBody("".getBytes());
 		f.setEncodingflag((byte) 1);
@@ -184,8 +202,9 @@ public class MP3Parser {
 			if(f.getID().equals("TYER"))
 				return f.toString();
 		}
+
+		// we dont have the frame so we have to create it
 		
-		//No frame found!
 		Frame f = new Frame();
 		f.setBody("".getBytes());
 		f.setEncodingflag((byte) 1);
@@ -205,6 +224,8 @@ public class MP3Parser {
 			if(f.getID().equals("APIC"))
 				return f.getBody();
 		}
+
+		// we dont have the frame so we have to create it
 		
 		Frame f = new Frame();
 		f.setFlags((short)0);
