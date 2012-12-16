@@ -70,87 +70,111 @@ public class Control {
 	}
 
 	/**
-	 * All files with .mp3 will be parsed, and if they are correct MP3 Files transferred into the tree
+	 * All files with .mp3 will be parsed, and if they are correct MP3 Files
+	 * transferred into the tree
 	 * 
 	 */
-	
-	private void fillTree(String pathToDirectory){
+
+	public void fillTree(String pathToDirectory) {
 		MP3_FileVisitor fileVisitor = new MP3_FileVisitor();
-        fileVisitor.pathMatcher = FileSystems.getDefault().
-        getPathMatcher("glob:" + "*.mp3*");
-        try {
+		fileVisitor.pathMatcher = FileSystems.getDefault().getPathMatcher(
+				"glob:" + "*.mp3*");
+
+		try {
 			Files.walkFileTree(Paths.get(pathToDirectory), fileVisitor);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		}
+
+		catch (IOException e) {
+
 			e.printStackTrace();
 		}
-		
-		
+
 	}
 
-	private class MP3_FileVisitor extends SimpleFileVisitor<Path>{
+	private class MP3_FileVisitor extends SimpleFileVisitor<Path> {
 		private PathMatcher pathMatcher;
 		private DefaultMutableTreeNode currentDirectory;
 		private DefaultMutableTreeNode mp3File;
 		private MP3File mp3;
 		private Directory directory;
-		
+
 		@Override
-		public FileVisitResult visitFile(Path filePath, BasicFileAttributes basicFileAttributes) {
-			if(filePath.getFileName() != null && pathMatcher.matches(filePath.getFileName())){
+		public FileVisitResult visitFile(Path filePath,
+				BasicFileAttributes basicFileAttributes) {
+
+			if (filePath.getFileName() != null
+					&& pathMatcher.matches(filePath.getFileName())) {
+
 				System.out.println("FILE:" + filePath);
+
 				mp3 = new MP3File();
+
 				try {
 					mp3 = parser.readMP3(filePath);
 					mp3.setPath(filePath.toString());
-				} catch (IOException e) {
+				}
+
+				catch (IOException e) {
 					return FileVisitResult.CONTINUE;
 				}
-				mp3File =  new DefaultMutableTreeNode(mp3);
+
+				mp3File = new DefaultMutableTreeNode(mp3);
+
 				currentDirectory.add(mp3File);
-		
+
 			}
 			return FileVisitResult.CONTINUE;
 		}
-		
+
 		@Override
-	    public FileVisitResult preVisitDirectory(Path directoryPath, BasicFileAttributes attrs) {
-	        if (directoryPath.getFileName() != null){
-	        		directory = new Directory(directoryPath.getFileName().toString());
-	        		DefaultMutableTreeNode tempDirectory = new DefaultMutableTreeNode(directory); 
-	        		if(currentDirectory != null){
-		        		currentDirectory.add(tempDirectory);
-		        		currentDirectory = tempDirectory;
-	        		} else {
-	        			currentDirectory = tempDirectory;
-	        			TreeModel temp = new DefaultTreeModel(currentDirectory);
-	        			tree = new DefaultMutableTreeNode(temp);
-	        			GUI.getTree().setModel(temp);
-	        		}
-	            	System.out.println("DIR: " + directoryPath);
-	        }
-	        return FileVisitResult.CONTINUE;
-	    }
-		
+		public FileVisitResult preVisitDirectory(Path directoryPath,
+				BasicFileAttributes attrs) {
+
+			if (directoryPath.getFileName() != null) {
+
+				directory = new Directory(directoryPath.getFileName()
+						.toString());
+				DefaultMutableTreeNode tempDirectory = new DefaultMutableTreeNode(
+						directory);
+				
+				if (currentDirectory != null) {
+					
+					currentDirectory.add(tempDirectory);
+					currentDirectory = tempDirectory;
+				
+				} else {
+					currentDirectory = tempDirectory;
+					TreeModel temp = new DefaultTreeModel(currentDirectory);
+					tree = new DefaultMutableTreeNode(temp);
+					GUI.getTree().setModel(temp);
+				}
+				System.out.println("DIR: " + directoryPath);
+			}
+			return FileVisitResult.CONTINUE;
+		}
+
 		@Override
-	    public FileVisitResult visitFileFailed(Path filePath, IOException exc) {
-	        return FileVisitResult.CONTINUE;
-	    }
-		
+		public FileVisitResult visitFileFailed(Path filePath, IOException exc) {
+			return FileVisitResult.CONTINUE;
+		}
+
 		@Override
-		public FileVisitResult postVisitDirectory(Path directoryPath,IOException exc){
+		public FileVisitResult postVisitDirectory(Path directoryPath,
+				IOException exc) {
 			DefaultMutableTreeNode tempDirectory = currentDirectory;
-			currentDirectory = (DefaultMutableTreeNode) currentDirectory.getParent();
-			if(tempDirectory.getChildCount() == 0){
+			currentDirectory = (DefaultMutableTreeNode) currentDirectory
+					.getParent();
+			if (tempDirectory.getChildCount() == 0) {
 				tempDirectory.removeFromParent();
 			}
 			return FileVisitResult.CONTINUE;
 		}
-		
+
 	}
-	
+
 	/**
-	 *  Will wrap the DefaultMutableTree into a JTree and adds all the listener.
+	 * Will wrap the DefaultMutableTree into a JTree and adds all the listener.
+	 * 
 	 * @return
 	 */
 	public JTree getTree() {
@@ -178,7 +202,7 @@ public class Control {
 			if (node == null)
 				return;
 			Object nodeInfo = node.getUserObject();
-			if (node.isLeaf() && nodeInfo instanceof MP3File ) {
+			if (node.isLeaf() && nodeInfo instanceof MP3File) {
 				MP3File mp3 = (MP3File) nodeInfo;
 
 				currentMP3 = mp3;
@@ -189,18 +213,23 @@ public class Control {
 				GUI.getArtist().setText(mp3.getArtist());
 				GUI.getAlbum().setText(mp3.getAlbum());
 				GUI.getYear().setText(mp3.getYear());
-				if(mp3.getCover() != null){
+				if (mp3.getCover() != null) {
 					ImageIcon newImage = new ImageIcon(mp3.getCover());
-					GUI.getCover().setIcon(new ImageIcon(newImage.getImage().getScaledInstance(250,250,java.awt.Image.SCALE_SMOOTH)));
+					GUI.getCover().setIcon(
+							new ImageIcon(newImage.getImage()
+									.getScaledInstance(250, 250,
+											java.awt.Image.SCALE_SMOOTH)));
+				} else {
+					ImageIcon newImage = new ImageIcon(Paths.get(
+							"./ressources/noimage.jpg").toString());
+					GUI.getCover().setIcon(
+							new ImageIcon(newImage.getImage()
+									.getScaledInstance(250, 250,
+											java.awt.Image.SCALE_SMOOTH)));
 				}
-				else {
-					ImageIcon newImage = new ImageIcon(Paths.get("./ressources/noimage.jpg").toString());
-					GUI.getCover().setIcon(new ImageIcon(newImage.getImage().getScaledInstance(250,250,java.awt.Image.SCALE_SMOOTH)));
-				}
-			} 
-			else{
+			} else {
 				GUI.setVisibilityOfInfoArea(false);
-			
+
 			}
 		}
 	}
@@ -217,57 +246,69 @@ public class Control {
 		mainProgram.getGUI().setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 	}
+
 	/**
 	 * FileChooseListener for choosing the directory to be parsed
-	 *
-	 *
+	 * 
+	 * 
 	 */
 	private class FileChooserListener implements ActionListener {
-		 public void actionPerformed(ActionEvent actionEvent) {
-		        JFileChooser theFileChooser = new JFileChooser(".");
-		        theFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		        int returnval = theFileChooser.showOpenDialog(null);
-		        if (returnval == JFileChooser.APPROVE_OPTION) {
-		          File selectedFile = theFileChooser.getSelectedFile();
-		          fillTree(selectedFile.getPath());
-		        } 
-		      }
-		 
-	}
-	
-	private class PictureFileChooserListener implements ActionListener {
 		public void actionPerformed(ActionEvent actionEvent) {
-	        JFileChooser theFileChooser = new JFileChooser(".");
-	        theFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	        FileFilter filter = new FileNameExtensionFilter("Image file", "jpg", "jpeg","png");
-	        theFileChooser.setFileFilter(filter);
-	        int returnval = theFileChooser.showOpenDialog(null);
-	        if (returnval == JFileChooser.APPROVE_OPTION) {
-	          File selectedFile = theFileChooser.getSelectedFile();
-	          try {
-				currentMP3.setCover(loadFileFromPersistentStore(selectedFile));
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			JFileChooser theFileChooser = new JFileChooser(".");
+			theFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			int returnval = theFileChooser.showOpenDialog(null);
+			if (returnval == JFileChooser.APPROVE_OPTION) {
+				File selectedFile = theFileChooser.getSelectedFile();
+				fillTree(selectedFile.getPath());
 			}
+		}
+
+	}
+
+	private class PictureFileChooserListener implements ActionListener {
+
+		public void actionPerformed(ActionEvent actionEvent) {
+			JFileChooser theFileChooser = new JFileChooser(".");
+			theFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			FileFilter filter = new FileNameExtensionFilter("Image file",
+					"jpg", "jpeg", "png");
+			theFileChooser.setFileFilter(filter);
+			int returnval = theFileChooser.showOpenDialog(null);
+
+			if (returnval == JFileChooser.APPROVE_OPTION) {
+				File selectedFile = theFileChooser.getSelectedFile();
+
+				try {
+					currentMP3
+							.setCover(loadFileFromPersistentStore(selectedFile));
+				}
+
+				catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
 				ImageIcon newImage = new ImageIcon(currentMP3.getCover());
-				GUI.getCover().setIcon(new ImageIcon(newImage.getImage().getScaledInstance(250,250,java.awt.Image.SCALE_SMOOTH)));
+				GUI.getCover().setIcon(
+						new ImageIcon(newImage.getImage().getScaledInstance(
+								250, 250, java.awt.Image.SCALE_SMOOTH)));
 				GUI.getCover().updateUI();
 				MimetypesFileTypeMap mtftp = new MimetypesFileTypeMap();
 				mtftp.addMimeTypes("png jpg jpeg");
-				currentMP3.setPictureMIME("image/" + mtftp.getContentType(selectedFile));
+				currentMP3.setPictureMIME("image/"
+						+ mtftp.getContentType(selectedFile));
 				System.out.println(currentMP3.getPictureMIME());
-	          
-	        } 
-	      }
+
+			}
+		}
 	}
-	
+
 	private class SaveListener implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
 			// TODO Auto-generated method stub
-	
+
 			if (arg0.getActionCommand() == "Metadaten speichern...") {
-	
+
 				if (currentMP3 != null) {
 					currentMP3.setAlbum(GUI.getAlbum().getText());
 					currentMP3.setArtist(GUI.getArtist().getText());
@@ -281,11 +322,12 @@ public class Control {
 					}
 				}
 			}
-	
+
 		}
 	}
+
 	private class MouseSaveListener implements MouseListener {
-		public void mouseClicked(MouseEvent e){
+		public void mouseClicked(MouseEvent e) {
 			if (currentMP3 != null) {
 				currentMP3.setAlbum(GUI.getAlbum().getText());
 				currentMP3.setArtist(GUI.getArtist().getText());
@@ -300,12 +342,13 @@ public class Control {
 				GUI.getTree().updateUI();
 			}
 		}
+
 		public void mousePressed(MouseEvent e) {
-		       
+
 		}
 
 		public void mouseReleased(MouseEvent e) {
-		      
+
 		}
 
 		public void mouseEntered(MouseEvent e) {
@@ -315,16 +358,14 @@ public class Control {
 		}
 
 	}
-	
-	 private byte[] loadFileFromPersistentStore(File file) throws Exception, FileNotFoundException {
-		 FileInputStream fileInputStream = new FileInputStream(file);
-	     byte[] data = new byte[(int) file.length()];
-	     fileInputStream.read(data);
-	     fileInputStream.close();
-	     return data;
-		 }
-	
-	
+
+	private byte[] loadFileFromPersistentStore(File file) throws Exception,
+			FileNotFoundException {
+		FileInputStream fileInputStream = new FileInputStream(file);
+		byte[] data = new byte[(int) file.length()];
+		fileInputStream.read(data);
+		fileInputStream.close();
+		return data;
+	}
+
 }
-
-

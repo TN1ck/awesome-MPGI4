@@ -1,6 +1,9 @@
 package tagEditor;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+
+import javax.swing.JTree;
 
 import org.junit.Test;
 
@@ -10,9 +13,12 @@ public class GUITest{
 	public void TestTree (){
 		
 		Control myControler = new Control();
-		assertNotNull(myControler);
+		assertNotNull(myControler.getTree());
+		System.out.println(myControler.getTree().getComponentCount());
+			
+		myControler.fillTree("Mp3 Sammlung");
+		System.out.println(myControler.getTree().getComponentCount());
 		
-
 	}
 	
 	
