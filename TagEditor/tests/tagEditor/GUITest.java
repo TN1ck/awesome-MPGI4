@@ -11,6 +11,7 @@ public class GUITest{
 		
 		Control myControler = new Control();
 		assertNotNull(myControler);
+		
 
 	}
 	

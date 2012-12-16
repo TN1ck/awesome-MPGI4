@@ -1,5 +1,6 @@
 package tagEditor;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -16,15 +17,20 @@ public class MP3Saver {
 	/** Overwrites the mp3 with the values of the mp3 model
 	 * 
 	 * @param mp3 - the mp3, which shall be saved
+	 * @param newFile - this is a optional Parameter to rename a File
+	 * 
 	 * @throws IOException
 	 */
 	public void saveMP3(MP3File mp3) throws IOException{
 		mp3.setFrames(); // set the frames 	
+		
 		FileChannel s = FileChannel.open(Paths.get(mp3.getPath()), StandardOpenOption.DELETE_ON_CLOSE);
+		
 		byte[] music = new byte[(int) s.size() - (mp3.getSize() +10)]; // create array for the music
 		s.position(mp3.getSize() + 10); // set the position
 		s.read(ByteBuffer.wrap(music)); // read the music
 		s.close(); //will also delete the old file
+		
  		RandomAccessFile sN = new RandomAccessFile(mp3.getPath(), "rw");
  		sN.write("ID3".getBytes(ascii)); // write ID3 version
  		sN.write(new byte[]{3,0}); // write main and subversion	

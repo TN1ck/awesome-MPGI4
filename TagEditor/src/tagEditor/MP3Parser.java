@@ -33,6 +33,8 @@ public class MP3Parser {
 		String IDString = new String(temp);
 		MP3File mp3 = new MP3File();
 		
+		mp3.setPath(filePath.toString());
+		
 		if(IDString.equals("ID3")){
 			byte mainversion = s.readByte();
 			byte subversion = s.readByte();
