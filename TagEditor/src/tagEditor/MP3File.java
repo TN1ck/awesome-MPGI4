@@ -19,6 +19,17 @@ class MP3File {
 	Charset utf8charset = Charset.forName("UTF-8");
 	Charset ascii = Charset.forName("ASCII");
 	
+	public MP3File(){
+		
+	}
+	public MP3File(String artist, String song, String album, String year, byte[] picture){
+		this.artist = artist;
+		this.song = song;
+		this.album = album;
+		this.year = year;
+		this.cover = picture;
+	}
+	
 	private String artist;
 	private String song;
 	private String album;

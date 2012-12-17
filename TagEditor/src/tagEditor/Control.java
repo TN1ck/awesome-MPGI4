@@ -60,7 +60,7 @@ public class Control {
 	 * Constructor-method of the control. Will fill the tree when called.
 	 */
 	public Control() {
-		this.GUI = new View(this.getTree());
+		this.GUI = new View(this.getTree(this.tree));
 		GUI.getJmiSave().addActionListener(new SaveListener());
 		GUI.getInformationArea().addMouseListener(new MouseSaveListener());
 		GUI.getJmiOpen().addActionListener(new FileChooserListener());
@@ -179,9 +179,9 @@ public class Control {
 	 * 
 	 * @return
 	 */
-	public JTree getTree() {
+	public JTree getTree(DefaultMutableTreeNode tree) {
 		// Initialize the tree
-		JTree DataTree = new JTree(this.tree);
+		JTree DataTree = new JTree(tree);
 		DataTree.getSelectionModel().setSelectionMode(
 				TreeSelectionModel.SINGLE_TREE_SELECTION);
 		// Listeners are strange...
