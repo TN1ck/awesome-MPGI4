@@ -1,15 +1,7 @@
 package tagEditor;
 
 
-import java.awt.image.BufferedImage;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeSelectionModel;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 
 
 class Frame {
@@ -31,6 +23,7 @@ class Frame {
 	/**
 	 * Will return the body of the frame according to the encoding-flag. Shouldn't be used for non-text-based frames.
 	 */
+	@Override
 	public String toString() {
 		try {
 			if(this.encodingflag == 0) {

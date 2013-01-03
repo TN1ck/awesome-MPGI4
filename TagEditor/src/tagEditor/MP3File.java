@@ -1,15 +1,9 @@
 package tagEditor;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Iterator;
-
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 
 /** This class represents a MP3-File*/
 class MP3File {
@@ -155,6 +149,7 @@ class MP3File {
 	 * @return The artist and the title of the file
 	 */
 	
+	@Override
 	public String toString(){
 		return new File(path).getName();
 	}

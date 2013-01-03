@@ -1,15 +1,10 @@
 package tagEditor;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 
-import java.nio.file.Paths;
-
-import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 

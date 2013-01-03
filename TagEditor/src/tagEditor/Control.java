@@ -1,14 +1,9 @@
 package tagEditor;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
-
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -18,13 +13,10 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeSelectionModel;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -39,10 +31,6 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
 import javax.activation.MimetypesFileTypeMap;
-import javax.imageio.ImageIO;
-import javax.imageio.stream.MemoryCacheImageInputStream;
-
-import resources.TestImages;
 
 /**
  * This class represents the control in MVC. It will communicate between view
@@ -199,6 +187,7 @@ public class Control {
 
 	private class TreeListener implements TreeSelectionListener {
 
+		@Override
 		public void valueChanged(TreeSelectionEvent e) {
 			// Get the element that is the depth of the current selection
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.getPath()
@@ -259,6 +248,7 @@ public class Control {
 	 */
 	private class FileChooserListener implements ActionListener {
 		
+		@Override
 		public void actionPerformed(ActionEvent actionEvent) {
 			JFileChooser theFileChooser = new JFileChooser(".");
 			theFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -273,6 +263,7 @@ public class Control {
 
 	private class PictureFileChooserListener implements ActionListener {
 
+		@Override
 		public void actionPerformed(ActionEvent actionEvent) {
 			JFileChooser theFileChooser = new JFileChooser(".");
 			theFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -310,6 +301,7 @@ public class Control {
 	}
 
 	private class SaveListener implements ActionListener {
+		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			// TODO Auto-generated method stub
 
@@ -333,6 +325,7 @@ public class Control {
 	}
 
 	private class MouseSaveListener implements MouseListener {
+		@Override
 		public void mouseClicked(MouseEvent e) {
 			if (currentMP3 != null) {
 				currentMP3.setAlbum(GUI.getAlbum().getText());
@@ -349,17 +342,21 @@ public class Control {
 			}
 		}
 
+		@Override
 		public void mousePressed(MouseEvent e) {
 
 		}
 
+		@Override
 		public void mouseReleased(MouseEvent e) {
 
 		}
 
+		@Override
 		public void mouseEntered(MouseEvent e) {
 		}
 
+		@Override
 		public void mouseExited(MouseEvent e) {
 		}
 

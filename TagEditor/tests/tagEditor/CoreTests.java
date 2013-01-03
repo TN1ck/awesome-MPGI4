@@ -1,6 +1,5 @@
 package tagEditor;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;

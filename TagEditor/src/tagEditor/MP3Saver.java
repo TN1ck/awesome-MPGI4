@@ -1,6 +1,5 @@
 package tagEditor;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -8,8 +7,6 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-
-import javax.swing.text.html.Option;
 
 public class MP3Saver {
 	Charset utf16charset= Charset.forName("UTF-16");
