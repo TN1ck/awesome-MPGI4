@@ -2,10 +2,14 @@ package tagEditor;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
 
 import org.junit.Test;
+
+import com.thoughtworks.xstream.XStream;
 
 public class CoreTests {
 
@@ -24,6 +28,7 @@ public class CoreTests {
 		
 		try {
 			myMp3 = parser.readMP3(Paths.get("01_What_i_hope.mp3"));
+		
 			assertEquals("House Plants", myMp3.getAlbum());
 			assertEquals("2010",myMp3.getYear());
 			assertEquals("Pinkle",myMp3.getArtist());

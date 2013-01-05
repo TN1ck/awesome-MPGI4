@@ -24,12 +24,12 @@ class MP3File {
 		this.cover = picture;
 	}
 	
-	private String artist;
-	private String song;
-	private String album;
-	private String year;
-	private String path;
-	private String pictureMIME;
+	public String artist;
+	public String song;
+	public String album;
+	public String year;
+	public String path;
+	public String pictureMIME;
 	//needed to read the music
 	private int tagSize;
 	private ArrayList<Frame> frames;

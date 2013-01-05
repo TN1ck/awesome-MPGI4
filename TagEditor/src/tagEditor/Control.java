@@ -4,9 +4,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.beans.XMLEncoder;
+
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -16,11 +19,17 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeSelectionModel;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -29,8 +38,10 @@ import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 
 import javax.activation.MimetypesFileTypeMap;
+import com.thoughtworks.xstream.*;
 
 /**
  * This class represents the control in MVC. It will communicate between view
@@ -60,10 +71,15 @@ public class Control {
 	/**
 	 * All files with .mp3 will be parsed, and if they are correct MP3 Files
 	 * transferred into the tree
+	 * @throws JAXBException 
+	 * @throws FileNotFoundException 
 	 * 
 	 */
 
-	public void fillTree(String pathToDirectory) {
+	public void fillTree(String pathToDirectory) throws JAXBException, FileNotFoundException {
+		
+		
+		
 		MP3_FileVisitor fileVisitor = new MP3_FileVisitor();
 		fileVisitor.pathMatcher = FileSystems.getDefault().getPathMatcher(
 				"glob:" + "*.mp3*");
@@ -77,6 +93,23 @@ public class Control {
 			e.printStackTrace();
 		}
 
+	
+//        //Serialize the object
+//        XStream xs = new XStream();
+//
+//        //Write to a file in the file system
+//        try {
+//            FileOutputStream fs = new FileOutputStream("test.xml");
+//            xs.toXML(tree, fs);
+//        } catch (FileNotFoundException e1) {
+//            e1.printStackTrace();
+//        }
+//		
+        
+
+		
+
+		
 	}
 
 	private class MP3_FileVisitor extends SimpleFileVisitor<Path> {
@@ -125,6 +158,40 @@ public class Control {
 				DefaultMutableTreeNode tempDirectory = new DefaultMutableTreeNode(
 						directory);
 				
+				String myPath = directoryPath.toString() + "/cache.xml";
+				File f = new File(myPath);
+				if(f.exists()) { 
+					
+					try {
+						XStream xs = new XStream();
+						ArrayList<Object> list = (ArrayList<Object>) xs.fromXML(new FileInputStream(f));
+						
+						for (int i = 0; i < list.size(); i++) {
+							
+							DefaultMutableTreeNode node = new DefaultMutableTreeNode(directory); 
+							
+							
+							if(list.get(i) instanceof Directory)
+							{
+							directory = (Directory)list.get(i);
+							}
+							else{
+								node.setUserObject(list.get(i));								
+							}
+							tempDirectory.add(node);
+						}
+						
+						
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+				}
+				
+				
+					
+					
 				if (currentDirectory != null) {
 					
 					currentDirectory.add(tempDirectory);
@@ -156,6 +223,45 @@ public class Control {
 					.getParent();
 			if (tempDirectory.getChildCount() == 0) {
 				tempDirectory.removeFromParent();
+			}
+			else{
+				
+				int childCount = tempDirectory.getChildCount();
+				System.out.println(childCount);
+					
+					ArrayList<Object> myChildList = new ArrayList<Object>();
+					
+					for (int i = 0; i < childCount; i++) {
+						DefaultMutableTreeNode node = (DefaultMutableTreeNode) tempDirectory.getChildAt(i);
+						myChildList.add(node.getUserObject());
+					}
+					
+					
+					
+			        XStream xs = new XStream();
+					
+					try {
+					            FileOutputStream fs = new FileOutputStream(directoryPath.toString() + "/cache.xml");
+					            xs.toXML(myChildList, fs);
+					     } catch (FileNotFoundException e1) {
+					            e1.printStackTrace();
+					     }
+
+//					if(childCount==2){
+//						try {
+//							ArrayList<Object> list = (ArrayList<Object>) xs.fromXML(new FileInputStream(directoryPath.toString() + "/cache.xml"));
+//							DefaultMutableTreeNode node = (DefaultMutableTreeNode) tempDirectory.getChildAt(1);
+//							MP3File file = (MP3File) list.get(1);
+//							file.album = "it worked";
+//							node.setUserObject(file);
+//							
+//						} catch (FileNotFoundException e) {
+//							// TODO Auto-generated catch block
+//							e.printStackTrace();
+//						}
+//						
+//					}
+					
 			}
 			return FileVisitResult.CONTINUE;
 		}
@@ -255,7 +361,13 @@ public class Control {
 			int returnval = theFileChooser.showOpenDialog(null);
 			if (returnval == JFileChooser.APPROVE_OPTION) {
 				File selectedFile = theFileChooser.getSelectedFile();
-				fillTree(selectedFile.getPath());
+				try {
+					fillTree(selectedFile.getPath());
+				} catch (JAXBException | FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 			}
 		}
 
