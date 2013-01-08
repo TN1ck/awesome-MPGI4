@@ -1,0 +1,28 @@
+<!DOCTYPE ADRESSEN SYSTEM "adresse.dtd">
+<ADRESSEN>
+        <!-- Der 1. Datensatz -->
+        <DATENSATZ nummer="A1">
+                <PERSON>
+			<NACHNAME>Mustermann</NACHNAME>
+                        <VORNAME>Hans</VORNAME>
+                </PERSON>
+                <ANSCHRIFT>
+                        <STRASSE>Musterweg 1</STRASSE>
+                        <PLZ>12345</PLZ>
+                        <ORT>Musterstadt</ORT>
+                </ANSCHRIFT>
+        </DATENSATZ>
+        <!-- Der 2. Datensatz -->
+        <DATENSATZ nummer="A2">
+                <PERSON>
+			<NACHNAME>Meier</NACHNAME>
+                        <VORNAME>Franz</VORNAME>
+                </PERSON>
+                <ANSCHRIFT>
+                        <STRASSE>Hauptstrasse 5</STRASSE>
+                        <POSTFACH>123</POSTFACH>
+                        <ORT>Neustadt</ORT>
+                        <Test>Test</Test>
+                </ANSCHRIFT>
+        </DATENSATZ>
+</ADRESSEN>

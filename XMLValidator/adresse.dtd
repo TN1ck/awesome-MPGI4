@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--DTD fuer Adressdatenbank-->
+
+<!-- ROOT-ELEMENT enthaelt beliebige Anzahl von Datensaetzen -->
+<!ELEMENT ADRESSEN (DATENSATZ)*>
+
+<!-- Ein Datensatz enthaelt die Elemente PERSON und ADRESSE -->
+<!ELEMENT DATENSATZ (PERSON,ANSCHRIFT)>
+
+<!-- Element PERSON beinhaltet Elemente NACHNAME und VORNAME -->
+<!ELEMENT PERSON (NACHNAME,VORNAME)>
+
+<!-- Element ADRESSE beinhaltet Elemente STRASSE, (PLZ o. POSTFACH) und ORT -->
+<!ELEMENT ANSCHRIFT (STRASSE, (PLZ | POSTFACH) ,ORT)>
+
+<!-- Inhalt der Elemente wird festgelegt (hier beliebiger Text) -->
+<!ELEMENT VORNAME (#PCDATA)>
+<!ELEMENT NACHNAME (#PCDATA)>
+<!ELEMENT PLZ (#PCDATA)>
+<!ELEMENT POSTFACH (#PCDATA)>
+<!ELEMENT STRASSE (#PCDATA)>
+<!ELEMENT ORT (#PCDATA)>
+
+<!-- DATENSATZ wird eine eindeutige ID hinzugefuegt u. der Anschrift die Art -->
+<!ATTLIST DATENSATZ nummer ID #REQUIRED>
+<!ATTLIST ANSCHRIFT art (privat | geschaeftlich) "privat">
