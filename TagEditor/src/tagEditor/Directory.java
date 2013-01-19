@@ -1,21 +1,27 @@
 package tagEditor;
 
+import java.nio.file.Paths;
+
 /** This class represents a directory
  */
 class Directory {
-	String name;
+	String path;
 	
 	
 	/**Constructor-Method of the directory, takes the name as parameter
 	 * 
 	 * @param name The name of the directory
 	 */
-	public Directory(String name) {
-		this.name = name;
+	public Directory(String path) {
+		this.path = path;
+	}
+	
+	public String getPath(){
+		return path;
 	}
 	
 	@Override
 	public String toString() {
-		return name;
+		return Paths.get(this.path).getFileName().toString();
 	}
 }
