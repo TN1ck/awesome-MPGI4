@@ -228,14 +228,19 @@ public class Control {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			if (currentMP3 != null) {
-				currentMP3.setAlbum(GUI.getAlbum().getText());
-				currentMP3.setArtist(GUI.getArtist().getText());
-				currentMP3.setYear(GUI.getYear().getText());
-				currentMP3.setSong(GUI.getSong().getText());
-				try {
-					saver.saveMP3(currentMP3);
-				} catch (IOException e) {
-					e.printStackTrace();
+				// is the year in the correct format?
+				if(GUI.getYear().getText().matches("[0-9]{4}") || GUI.getYear().getText().equals("")){
+					currentMP3.setAlbum(GUI.getAlbum().getText());
+					currentMP3.setArtist(GUI.getArtist().getText());
+					currentMP3.setYear(GUI.getYear().getText());
+					currentMP3.setSong(GUI.getSong().getText());
+					try {
+						saver.saveMP3(currentMP3);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				} else {
+					GUI.getYear().setText("");
 				}
 			}
 
@@ -246,16 +251,20 @@ public class Control {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if (currentMP3 != null) {
-				currentMP3.setAlbum(GUI.getAlbum().getText());
-				currentMP3.setArtist(GUI.getArtist().getText());
-				currentMP3.setYear(GUI.getYear().getText());
-				currentMP3.setSong(GUI.getSong().getText());
-				try {
-					saver.saveMP3(currentMP3);
-				} catch (IOException e1) {
-					e1.printStackTrace();
+				// is the year in the correct format?
+				if(GUI.getYear().getText().matches("[0-9]{4}") || GUI.getYear().getText().equals("")){
+					currentMP3.setAlbum(GUI.getAlbum().getText());
+					currentMP3.setArtist(GUI.getArtist().getText());
+					currentMP3.setYear(GUI.getYear().getText());
+					currentMP3.setSong(GUI.getSong().getText());
+					try {
+						saver.saveMP3(currentMP3);
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				} else {
+					GUI.getYear().setText("");
 				}
-				GUI.getTree().updateUI();
 			}
 		}
 		@Override
