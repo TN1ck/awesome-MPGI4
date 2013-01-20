@@ -32,6 +32,7 @@ public class View extends JFrame {
 	private JLabel cover;
 	protected JMenuItem jmiSave;
 	protected JMenuItem jmiOpen;
+	protected JMenuItem jmiDeleteCover;
 	protected JButton editCover;
 	private Container informationArea;
 	private JTree tree;
@@ -78,6 +79,9 @@ public class View extends JFrame {
 	
 	public JButton getEditCover() {
 		return editCover;
+	}
+	public JMenuItem getJmiDeleteCover() {
+		return jmiDeleteCover;
 	}
 
 	/**
@@ -186,6 +190,9 @@ public class View extends JFrame {
 
 		jmiSave = new JMenuItem("Metadaten speichern...");
 		jmiSave.setMnemonic('s');
+		
+		jmiDeleteCover = new JMenuItem("Cover löschen");
+		fileMenu.add(jmiDeleteCover);
 
 		fileMenu.add(jmiSave);
 

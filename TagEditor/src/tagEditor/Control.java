@@ -56,6 +56,7 @@ public class Control {
 		GUI.getInformationArea().addMouseListener(new MouseSaveListener());
 		GUI.getJmiOpen().addActionListener(new FileChooserListener());
 		GUI.getEditCover().addActionListener(new PictureFileChooserListener());
+		GUI.getJmiDeleteCover().addActionListener(new DeleteCoverListener());
 		GUI.addWindowListener(new WindowAdapter() {
 		@Override
 		public void windowClosing(WindowEvent e) {
@@ -206,14 +207,12 @@ public class Control {
 			if (returnval == JFileChooser.APPROVE_OPTION) {
 				File selectedFile = theFileChooser.getSelectedFile();
 				try {
-					currentMP3
-							.setCover(loadFileFromPersistentStore(selectedFile));
+					currentMP3.setCover(loadFileFromPersistentStore(selectedFile));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 				ImageIcon newImage = new ImageIcon(currentMP3.getCover());
-				GUI.getCover().setIcon(new ImageIcon(newImage.getImage()
-											.getScaledInstance(250, 250, java.awt.Image.SCALE_SMOOTH)));
+				GUI.getCover().setIcon(new ImageIcon(newImage.getImage().getScaledInstance(250, 250, java.awt.Image.SCALE_SMOOTH)));
 				GUI.getCover().updateUI();
 				MimetypesFileTypeMap mtftp = new MimetypesFileTypeMap();
 				mtftp.addMimeTypes("png jpg jpeg");
@@ -242,6 +241,20 @@ public class Control {
 				} else {
 					GUI.getYear().setText("");
 				}
+			}
+
+		}
+	}
+	
+	private class DeleteCoverListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			if (currentMP3 != null) {
+				// is the year in the correct format?
+				currentMP3.setCover(new byte[]{});
+				ImageIcon newImage = new ImageIcon(currentMP3.getCover());
+				GUI.getCover().setIcon(new ImageIcon(newImage.getImage().getScaledInstance(250, 250, java.awt.Image.SCALE_SMOOTH)));
+				GUI.getCover().updateUI();
 			}
 
 		}
