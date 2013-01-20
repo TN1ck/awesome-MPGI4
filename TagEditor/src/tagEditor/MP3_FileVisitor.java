@@ -9,7 +9,6 @@ import java.nio.file.PathMatcher;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.xml.parsers.DocumentBuilder;
@@ -23,7 +22,7 @@ import org.xml.sax.SAXException;
 public class MP3_FileVisitor extends SimpleFileVisitor<Path> {
 	
 	private PathMatcher pathMatcher;
-	private DefaultMutableTreeNode tree;
+	private TreeModel tree;
 	private Element currentDirectory;
 	private Element root;
 	private Element mp3File;
@@ -48,38 +47,37 @@ public class MP3_FileVisitor extends SimpleFileVisitor<Path> {
 				e.printStackTrace();
 			}
 			this.doc = dBuilder.newDocument();
-		
-		
 	}
 	
 	@Override
 	public FileVisitResult visitFile(Path filePath,BasicFileAttributes basicFileAttributes) {
 		if (filePath.getFileName() != null && pathMatcher.matches(filePath.getFileName())) {
 			// Everything worked fine, so let's parse the file
-			if(cacheExists){ // was the file modified after the cache was created?
+			if(cacheExists){ 
 				File f = new File(filePath.toString());
-				if(cacheDoc.getElementById(filePath.toString()) == null){
-					System.out.println("Found element that was not in the cache!");
+				if(cacheDoc.getElementById(filePath.toString()) == null){ // Is the file in the cache?
+					System.out.println("CACHE MISS: FILE:" + filePath);
 					cacheTooOld = true;
 				}
-				else if(f.lastModified() > lastTimeCacheChanged){
-					System.out.println("Found element that was modified!");
+				else if(f.lastModified() > lastTimeCacheChanged){ // Was the file modified?
+					System.out.println("MODIFIED: FILE:" + filePath);
 					cacheTooOld = true;
 				}
 			}
 			if(cacheTooOld || !cacheExists){
-			mp3 = new MP3File(); 
-			try {
-				mp3 = parser.readMP3(filePath);
-				mp3.setPath(filePath.toString());
-			} catch (IOException e) {
-				// Maybe an ID3v24 tag, but nonetheless just continue
-				return FileVisitResult.CONTINUE;
-			}
-			mp3File = XMLControl.MP3ToXML(mp3, this.doc);
-			currentDirectory.appendChild(mp3File);
+				mp3 = new MP3File(); 
+				try {
+					mp3 = parser.readMP3(filePath);
+					mp3.setPath(filePath.toString());
+				} catch (IOException e) {
+					// Maybe an ID3v24 tag, but nonetheless just continue
+					return FileVisitResult.CONTINUE;
+				}
+				mp3File = XMLControl.MP3ToXML(mp3, this.doc);
+				currentDirectory.appendChild(mp3File);
 			} else {
-				System.out.println("FILE:" + filePath + " war im cache!");
+				System.out.println("CACHE HIT: FILE:" + filePath.getFileName());
+				// This is how one transfer the node of one document to another, wtf
 				Element temp = cacheDoc.getElementById(filePath.toString());
 				currentDirectory.appendChild(doc.adoptNode(temp.cloneNode(true)));
 			}
@@ -106,10 +104,8 @@ public class MP3_FileVisitor extends SimpleFileVisitor<Path> {
 				} catch (SAXException | IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}
-				
+				}		
 			}
-			
 			if (currentDirectory != null) { // root set? If so, add the working directory onto the current parent directory
 				currentDirectory.appendChild(tempDirectory); 
 				currentDirectory = tempDirectory;
@@ -137,15 +133,14 @@ public class MP3_FileVisitor extends SimpleFileVisitor<Path> {
 		return FileVisitResult.CONTINUE;
 	}
 	
-	public DefaultMutableTreeNode getTree() {
+	public TreeModel getTree() {
 		doc.appendChild(root);
-		TreeModel temp = new DefaultTreeModel(XMLControl.build(doc.getDocumentElement()));
-		tree = new DefaultMutableTreeNode(temp);
-		GUI.getTree().setModel(temp);
+		tree = new DefaultTreeModel(XMLControl.build(doc.getDocumentElement()));
+		GUI.getTree().setModel(tree);
 		return tree;
 	}
 	
-	public boolean getCacheTooOld(){
+	public boolean getCacheTooOld() {
 		return this.cacheTooOld;
 	}
 

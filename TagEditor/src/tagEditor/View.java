@@ -6,7 +6,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -24,6 +23,7 @@ import javax.swing.JTree;
  */
 public class View extends JFrame {
 
+	private static final long serialVersionUID = 1L;
 	// Declare the UI elements
 	private JLabel songLabel, artistLabel, albumLabel, yearLabel;
 	private JTextField song, artist, album, year;
@@ -34,7 +34,6 @@ public class View extends JFrame {
 	protected JMenuItem jmiOpen;
 	protected JButton editCover;
 	private Container informationArea;
-	private JFileChooser fileChooser;
 	private JTree tree;
 	private JSplitPane splitPane;
 	
@@ -181,7 +180,7 @@ public class View extends JFrame {
 		JMenu fileMenu = new JMenu("Datei");
 		fileMenu.setMnemonic('d');
 
-		jmiOpen = new JMenuItem("Verzeichnis šffnen...");
+		jmiOpen = new JMenuItem("Verzeichnis ï¿½ffnen...");
 		jmiOpen.setMnemonic('f');
 		fileMenu.add(jmiOpen);
 

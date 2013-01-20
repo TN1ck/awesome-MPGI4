@@ -24,6 +24,14 @@ import org.xml.sax.SAXException;
 
 public class XMLControl {
 
+	/** Reads the xml-file given with file and returns a DefaultMutableTreeNode representation of it
+	 * 
+	 * @param file - the xml-file that shall be read and transformed into a DefaultMutableTreeNode
+	 * @return the DefaultMutableTreeNode representation of the xml-file
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 */
 	public static DefaultMutableTreeNode readCache(File file) throws ParserConfigurationException, SAXException, IOException {
 	    // do something with the current node instead of System.out
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -32,6 +40,11 @@ public class XMLControl {
 	    return build(doc.getDocumentElement());
 	}
 	
+	/** Will transform a XML-file in form of a Element (w3c.dom) into a DefaultMutableTreeNode
+	 * 
+	 * @param e - the xml-tree in form of a Element (w3c.dom)
+	 * @return the DefaultMutableTreeNode representation of the xml-file
+	 */
 	public static DefaultMutableTreeNode build(Element e) {
 		   DefaultMutableTreeNode result = null;
 		   if(e.getNodeName() == "directory"){
@@ -69,24 +82,24 @@ public class XMLControl {
 				   			case "imageDescription":frame.setImageDescription(Base64.decodeBase64(frameNode.getTextContent())); break;
 				   			case "MIMEType":		frame.setMIMEType(Base64.decodeBase64(frameNode.getTextContent()));break;			
 				   			}
-				   			
 				   		}
 				   		frameList.add(frame);
 				   		break;
 				   }
 				  mp3.setFrames(frameList);
-				  result = new DefaultMutableTreeNode(mp3);
-					   
+				  result = new DefaultMutableTreeNode(mp3);	   
 			   }
 		   }
-		   
-
-		   return result;         
+		  return result;         
 		}
-	
+	/** Will write xml-representation of the given DefaulteMutableTreeNode into the file given with pathToDirectory
+	 * 
+	 * @param root - the root element of the DefaultMutableTreeNode
+	 * @param pathToDirectory - the location of the xml file
+	 * @throws ParserConfigurationException
+	 * @throws TransformerException
+	 */
 	public static void writeCache(DefaultMutableTreeNode root, String pathToDirectory) throws ParserConfigurationException, TransformerException {
-	    DefaultMutableTreeNode currentParent = root;
-	    
 	    DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 	    Document doc = docBuilder.newDocument();
@@ -109,8 +122,14 @@ public class XMLControl {
 	  
 	}
 	
+	/** Recursive function that will transform the given DefaultMutableTreeNode into a Element, uses doc as Element-creater-platform...
+	 * 
+	 * @param doc - the xml-document that serves as Element-creator
+	 * @param root - the DefaultMutableTreeNode that will be transformed
+	 * @return the xml-representation of the DefaultMutableTreeNode
+	 */		
 	private static Element fillXml(Document doc, DefaultMutableTreeNode root){
-		 Element currentRoot = doc.createElement("directory"), currentElement = null, SubElement = null, SubSubElement = null;
+		 Element currentRoot = doc.createElement("directory");
 		 currentRoot.setAttribute("filename",((Directory) root.getUserObject()).getPath());
 		 currentRoot.setAttribute("id", ((Directory) root.getUserObject()).getPath());
 		 for(int i = 0; i < root.getChildCount(); i++){
@@ -126,7 +145,12 @@ public class XMLControl {
 		 return currentRoot;
 		 
 	}
-	
+	/** Takes a mp3 serialize it to xml
+	 * 
+	 * @param mp3 - the mp3 that shall be serialized
+	 * @param doc - the xml-document that serves as Element-creator
+	 * @return the serialized mp3 in form of an Element (w3c.dom)
+	 */
 	public static Element MP3ToXML(MP3File mp3, Document doc){
 	 Element currentElement = null, SubElement = null, SubSubElement = null;
 	 
@@ -179,6 +203,13 @@ public class XMLControl {
 			return currentElement;
 	}
 	
+	
+	/** Takes a directory and serialize it to xml
+	 * 
+	 * @param directory - the directory that shall be serialized
+	 * @param doc - the xml-document that serves as Element-creator
+	 * @return the serialized version of the directory
+	 */
 	public static Element DirectoryToXML(Directory directory, Document doc){
 		Element e = doc.createElement("directory");
 		e.setAttribute("filename", directory.getPath());

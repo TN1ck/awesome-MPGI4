@@ -6,21 +6,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Enumeration;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.swing.ImageIcon;
@@ -33,26 +24,12 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeSelectionModel;
 import javax.xml.bind.JAXBException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import org.apache.commons.codec.binary.Base64;
 
 /**
  * This class represents the control in MVC. It will communicate between view
@@ -110,7 +87,7 @@ public class Control {
 		}catch (IOException e) {
 			e.printStackTrace();
 		}
-		this.tree = fileVisitor.getTree();
+		this.tree = new DefaultMutableTreeNode(fileVisitor.getTree());
 	}
 	
 	/**
@@ -147,9 +124,7 @@ public class Control {
 			Object nodeInfo = node.getUserObject();
 			if (node.isLeaf() && nodeInfo instanceof MP3File) {
 				MP3File mp3 = (MP3File) nodeInfo;
-
 				currentMP3 = mp3;
-
 				// Update the UI
 				GUI.setVisibilityOfInfoArea(true);
 				GUI.getSong().setText(mp3.getSong());
@@ -158,17 +133,10 @@ public class Control {
 				GUI.getYear().setText(mp3.getYear());
 				if (mp3.getCover() != null) {
 					ImageIcon newImage = new ImageIcon(mp3.getCover());
-					GUI.getCover().setIcon(
-							new ImageIcon(newImage.getImage()
-									.getScaledInstance(250, 250,
-											java.awt.Image.SCALE_SMOOTH)));
+					GUI.getCover().setIcon(new ImageIcon(newImage.getImage().getScaledInstance(250, 250,java.awt.Image.SCALE_SMOOTH)));
 				} else {
-					ImageIcon newImage = new ImageIcon(Paths.get(
-							"./ressources/noimage.jpg").toString());
-					GUI.getCover().setIcon(
-							new ImageIcon(newImage.getImage()
-									.getScaledInstance(250, 250,
-											java.awt.Image.SCALE_SMOOTH)));
+					ImageIcon newImage = new ImageIcon(Paths.get("./ressources/noimage.jpg").toString());
+					GUI.getCover().setIcon(new ImageIcon(newImage.getImage().getScaledInstance(250, 250,java.awt.Image.SCALE_SMOOTH)));
 				}
 			} else {
 				GUI.setVisibilityOfInfoArea(false);
@@ -207,7 +175,6 @@ public class Control {
 				try {
 					fillTree(selectedFile.getPath());
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				
@@ -249,21 +216,15 @@ public class Control {
 	private class SaveListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			// TODO Auto-generated method stub
-
-			if (arg0.getActionCommand() == "Metadaten speichern...") {
-
-				if (currentMP3 != null) {
-					currentMP3.setAlbum(GUI.getAlbum().getText());
-					currentMP3.setArtist(GUI.getArtist().getText());
-					currentMP3.setYear(GUI.getYear().getText());
-					currentMP3.setSong(GUI.getSong().getText());
-					try {
-						saver.saveMP3(currentMP3);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+			if (currentMP3 != null) {
+				currentMP3.setAlbum(GUI.getAlbum().getText());
+				currentMP3.setArtist(GUI.getArtist().getText());
+				currentMP3.setYear(GUI.getYear().getText());
+				currentMP3.setSong(GUI.getSong().getText());
+				try {
+					saver.saveMP3(currentMP3);
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
 
@@ -281,7 +242,6 @@ public class Control {
 				try {
 					saver.saveMP3(currentMP3);
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 				GUI.getTree().updateUI();
