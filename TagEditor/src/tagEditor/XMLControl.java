@@ -114,10 +114,6 @@ public class XMLControl {
  		transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, "cache.dtd");
  		DOMSource source = new DOMSource(doc);
  		StreamResult result = new StreamResult(new File(pathToDirectory));
-  
- 		// Output to console for testing
- 		// StreamResult result = new StreamResult(System.out);
-  
  		transformer.transform(source, result);
 	  
 	}

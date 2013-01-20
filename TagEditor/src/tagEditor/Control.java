@@ -9,6 +9,8 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -42,6 +44,7 @@ public class Control {
 	private DefaultMutableTreeNode tree;
 	private MP3Saver saver;
 	private String pathToXML;
+	private String rootDirectory;
 
 
 	/**
@@ -59,6 +62,13 @@ public class Control {
 			try {
 				// I should refactor...
 				XMLControl.writeCache((DefaultMutableTreeNode) ((DefaultTreeModel) tree.getUserObject()).getRoot(), pathToXML);
+				FileReader in = new FileReader(new File("./ressources/cache.dtd"));
+				FileWriter out = new FileWriter(new File(rootDirectory + "/cache.dtd"));
+				int c;
+				while ((c = in.read()) != -1)
+				      out.write(c);
+				in.close();
+				out.close();
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -88,6 +98,7 @@ public class Control {
 			e.printStackTrace();
 		}
 		this.tree = new DefaultMutableTreeNode(fileVisitor.getTree());
+		this.rootDirectory = fileVisitor.getRootDirectory();
 	}
 	
 	/**

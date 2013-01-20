@@ -14,7 +14,7 @@
 <!ELEMENT year (text)>
 <!ELEMENT cover (text)>
 
-<!ELEMENT text (#CDATA)>
+<!ELEMENT text (#PCDATA)>
 
 <!ELEMENT flags (text)>
 <!ELEMENT encodingflag (text)>
@@ -22,7 +22,7 @@
 <!ELEMENT body (text)>
 <!ELEMENT pictureType (text)>
 <!ELEMENT imageDescription (text)>
-<!ELEMENT MIMEType(text)>
+<!ELEMENT MIMEType (text)>
 
 <!ATTLIST frame ID CDATA #REQUIRED>
 

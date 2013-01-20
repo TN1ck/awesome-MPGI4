@@ -93,12 +93,10 @@ public class MP3_FileVisitor extends SimpleFileVisitor<Path> {
 			Element tempDirectory = XMLControl.DirectoryToXML(directory, doc);
 			String myPath = directoryPath.toString() + "/cache.xml";
 			File f = new File(myPath);
-			if(!cacheExists){
-				cacheExists = f.exists();
+			//Does the cache exists and is it the first cache?
+			if(f.exists() && !cacheExists) {
 				lastTimeCacheChanged = f.lastModified();
-			}
-			//Does the cache exists? If so, skip the parsing and just use the cache
-			if(f.exists()) { 
+				cacheExists = true;
 				try {
 					this.cacheDoc = dBuilder.parse(f);
 				} catch (SAXException | IOException e) {
@@ -142,6 +140,10 @@ public class MP3_FileVisitor extends SimpleFileVisitor<Path> {
 	
 	public boolean getCacheTooOld() {
 		return this.cacheTooOld;
+	}
+	
+	public String getRootDirectory(){
+		return root.getAttribute("filename");
 	}
 
 }
