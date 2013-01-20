@@ -67,7 +67,7 @@ public class XMLControl {
 				   	case "song":   mp3.setSong(node.getTextContent()); break;
 				   	case "year":   mp3.setYear(node.getTextContent()); break;
 				   	case "tagsize":mp3.setSize(new Integer(node.getTextContent())); break;
-				   	case "cover":  mp3.setCover(Base64.decodeBase64(node.getTextContent())); break;
+				    case "cover":  mp3.setCover(Base64.decodeBase64(node.getTextContent())); break;
 				   	case "frame": 
 				   		NodeList frames = node.getChildNodes();
 				   		Frame frame = new Frame();
@@ -103,7 +103,7 @@ public class XMLControl {
 	    DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 	    Document doc = docBuilder.newDocument();
-	    
+	    System.out.println("Writing Cache in the location " + pathToDirectory);
 	    Element rootElement = fillXml(doc,root);
 	    doc.appendChild(rootElement);
 	    // write the content into xml file

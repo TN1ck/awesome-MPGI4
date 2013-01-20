@@ -180,7 +180,7 @@ public class View extends JFrame {
 		JMenu fileMenu = new JMenu("Datei");
 		fileMenu.setMnemonic('d');
 
-		jmiOpen = new JMenuItem("Verzeichnis �ffnen...");
+		jmiOpen = new JMenuItem("Verzeichnis öffnen...");
 		jmiOpen.setMnemonic('f');
 		fileMenu.add(jmiOpen);
 
