@@ -62,7 +62,7 @@ public class Control {
 		public void windowClosing(WindowEvent e) {
 			try {
 				// I should refactor...
-				XMLControl.writeCache((DefaultMutableTreeNode) ((DefaultTreeModel) tree.getUserObject()).getRoot(), pathToXML);
+				XMLControl.writeCache(getRoot(), pathToXML);
 				FileReader in = new FileReader(new File("./ressources/cache.dtd"));
 				FileWriter out = new FileWriter(new File(rootDirectory + "/cache.dtd"));
 				int c;
@@ -100,6 +100,14 @@ public class Control {
 		}
 		this.tree = new DefaultMutableTreeNode(fileVisitor.getTree());
 		this.rootDirectory = fileVisitor.getRootDirectory();
+	}
+	
+	/**
+	 * @return the root of our tree
+	 */
+	public DefaultMutableTreeNode getRoot(){
+		
+		return (DefaultMutableTreeNode) ((DefaultTreeModel) this.tree.getUserObject()).getRoot();
 	}
 	
 	/**

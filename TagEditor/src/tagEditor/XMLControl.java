@@ -95,15 +95,15 @@ public class XMLControl {
 	/** Will write xml-representation of the given DefaulteMutableTreeNode into the file given with pathToDirectory
 	 * 
 	 * @param root - the root element of the DefaultMutableTreeNode
-	 * @param pathToDirectory - the location of the xml file
+	 * @param pathToFile - path to to the xmlFile
 	 * @throws ParserConfigurationException
 	 * @throws TransformerException
 	 */
-	public static void writeCache(DefaultMutableTreeNode root, String pathToDirectory) throws ParserConfigurationException, TransformerException {
+	public static void writeCache(DefaultMutableTreeNode root, String pathToFile) throws ParserConfigurationException, TransformerException {
 	    DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 	    Document doc = docBuilder.newDocument();
-	    System.out.println("Writing Cache in the location " + pathToDirectory);
+	    System.out.println("Writing Cache in the location " + pathToFile);
 	    Element rootElement = fillXml(doc,root);
 	    doc.appendChild(rootElement);
 	    // write the content into xml file
@@ -113,7 +113,7 @@ public class XMLControl {
  		transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
  		transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, "cache.dtd");
  		DOMSource source = new DOMSource(doc);
- 		StreamResult result = new StreamResult(new File(pathToDirectory));
+ 		StreamResult result = new StreamResult(new File(pathToFile));
  		transformer.transform(source, result);
 	  
 	}
