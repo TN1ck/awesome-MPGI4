@@ -52,7 +52,7 @@ public class CacheTests {
 		}
 		
 		
-		assertEquals(myRoot.isRoot(), myRoot.isRoot());
+		assertEquals(myRoot.isRoot(), newRoot.isRoot());
 		
 		assertEquals(myRoot.getChildCount(), newRoot.getChildCount());
 		int count = myRoot.getChildCount();

@@ -35,6 +35,7 @@ public class XMLControl {
 	public static DefaultMutableTreeNode readCache(File file) throws ParserConfigurationException, SAXException, IOException {
 	    // do something with the current node instead of System.out
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		dbFactory.setValidating(true);
 		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 		Document doc = dBuilder.parse(file);
 	    return build(doc.getDocumentElement());

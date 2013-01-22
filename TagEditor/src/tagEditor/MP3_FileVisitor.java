@@ -41,7 +41,10 @@ public class MP3_FileVisitor extends SimpleFileVisitor<Path> {
 		this.pathMatcher = FileSystems.getDefault().getPathMatcher("glob:" + "*.mp3*");
 		this.GUI = GUI;
 			try {
-				dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+				DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+				dbFactory.setValidating(true);
+				dBuilder = dbFactory.newDocumentBuilder();
+				
 			} catch (ParserConfigurationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
