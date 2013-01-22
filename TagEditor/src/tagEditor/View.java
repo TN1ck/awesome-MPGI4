@@ -184,14 +184,14 @@ public class View extends JFrame {
 		JMenu fileMenu = new JMenu("Datei");
 		fileMenu.setMnemonic('d');
 
-		jmiOpen = new JMenuItem("Verzeichnis √∂ffnen...");
+		jmiOpen = new JMenuItem("Verzeichnis öffnen...");
 		jmiOpen.setMnemonic('f');
 		fileMenu.add(jmiOpen);
 
 		jmiSave = new JMenuItem("Metadaten speichern...");
 		jmiSave.setMnemonic('s');
 		
-		jmiDeleteCover = new JMenuItem("Cover l√∂schen");
+		jmiDeleteCover = new JMenuItem("Cover löschen");
 		fileMenu.add(jmiDeleteCover);
 
 		fileMenu.add(jmiSave);

@@ -62,14 +62,16 @@ public class Control {
 		public void windowClosing(WindowEvent e) {
 			try {
 				// I should refactor...
-				XMLControl.writeCache(getRoot(), pathToXML);
-				FileReader in = new FileReader(new File("./ressources/cache.dtd"));
-				FileWriter out = new FileWriter(new File(rootDirectory + "/cache.dtd"));
-				int c;
-				while ((c = in.read()) != -1)
-				      out.write(c);
-				in.close();
-				out.close();
+				if(tree != null){
+					XMLControl.writeCache(getRoot(), pathToXML);
+					FileReader in = new FileReader(new File("./ressources/cache.dtd"));
+					FileWriter out = new FileWriter(new File(rootDirectory + "/cache.dtd"));
+					int c;
+					while ((c = in.read()) != -1)
+						out.write(c);
+					in.close();
+					out.close();
+				}
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
