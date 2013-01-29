@@ -4,12 +4,21 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.beans.XMLEncoder;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
+import javax.activation.MimetypesFileTypeMap;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -17,31 +26,12 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeSelectionModel;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import javax.xml.parsers.ParserConfigurationException;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.nio.file.FileSystems;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.PathMatcher;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
+import org.xml.sax.SAXException;
 
-import javax.activation.MimetypesFileTypeMap;
-import com.thoughtworks.xstream.*;
 
 /**
  * This class represents the control in MVC. It will communicate between view
@@ -53,10 +43,12 @@ public class Control {
 	private MP3File currentMP3;
 	private DefaultMutableTreeNode tree;
 	private MP3Saver saver;
-	private MP3Parser parser;
+	private String pathToXML;
+	private String rootDirectory;
+
 
 	/**
-	 * Constructor-method of the control. Will fill the tree when called.
+	 * Constructor-method of the control. Will set up the gui with all listeners.
 	 */
 	public Control() {
 		this.GUI = new View(this.getTree(this.tree));
@@ -64,210 +56,62 @@ public class Control {
 		GUI.getInformationArea().addMouseListener(new MouseSaveListener());
 		GUI.getJmiOpen().addActionListener(new FileChooserListener());
 		GUI.getEditCover().addActionListener(new PictureFileChooserListener());
+		GUI.getJmiDeleteCover().addActionListener(new DeleteCoverListener());
+		GUI.addWindowListener(new WindowAdapter() {
+		@Override
+		public void windowClosing(WindowEvent e) {
+			try {
+				// I should refactor...
+				if(tree != null){
+					XMLControl.writeCache(getRoot(), pathToXML);
+					FileReader in = new FileReader(new File("./ressources/cache.dtd"));
+					FileWriter out = new FileWriter(new File(rootDirectory + "/cache.dtd"));
+					int c;
+					while ((c = in.read()) != -1)
+						out.write(c);
+					in.close();
+					out.close();
+				}
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			System.exit(0);
+		}
+		});
 		this.saver = new MP3Saver();
-		this.parser = new MP3Parser();
 	}
 
 	/**
 	 * All files with .mp3 will be parsed, and if they are correct MP3 Files
 	 * transferred into the tree
 	 * @throws JAXBException 
-	 * @throws FileNotFoundException 
+	 * @throws IOException 
+	 * @throws SAXException 
+	 * @throws ParserConfigurationException 
 	 * 
 	 */
-
-	public void fillTree(String pathToDirectory) throws JAXBException, FileNotFoundException {
-		
-		
-		
-		MP3_FileVisitor fileVisitor = new MP3_FileVisitor();
-		fileVisitor.pathMatcher = FileSystems.getDefault().getPathMatcher(
-				"glob:" + "*.mp3*");
-
+	public void fillTree(String pathToDirectory) throws JAXBException, SAXException, IOException, ParserConfigurationException {	
+		// Check's if there's a cache, if not, it will parse the directory
+		this.pathToXML = pathToDirectory + "/cache.xml";
+		MP3_FileVisitor fileVisitor = new MP3_FileVisitor(this.GUI);
 		try {
 			Files.walkFileTree(Paths.get(pathToDirectory), fileVisitor);
-		}
-
-		catch (IOException e) {
-
+		}catch (IOException e) {
 			e.printStackTrace();
 		}
-
+		this.tree = new DefaultMutableTreeNode(fileVisitor.getTree());
+		this.rootDirectory = fileVisitor.getRootDirectory();
+	}
 	
-//        //Serialize the object
-//        XStream xs = new XStream();
-//
-//        //Write to a file in the file system
-//        try {
-//            FileOutputStream fs = new FileOutputStream("test.xml");
-//            xs.toXML(tree, fs);
-//        } catch (FileNotFoundException e1) {
-//            e1.printStackTrace();
-//        }
-//		
-        
-
+	/**
+	 * @return the root of our tree
+	 */
+	public DefaultMutableTreeNode getRoot(){
 		
-
-		
+		return (DefaultMutableTreeNode) ((DefaultTreeModel) this.tree.getUserObject()).getRoot();
 	}
-
-	private class MP3_FileVisitor extends SimpleFileVisitor<Path> {
-		private PathMatcher pathMatcher;
-		private DefaultMutableTreeNode currentDirectory;
-		private DefaultMutableTreeNode mp3File;
-		private MP3File mp3;
-		private Directory directory;
-
-		@Override
-		public FileVisitResult visitFile(Path filePath,
-				BasicFileAttributes basicFileAttributes) {
-
-			if (filePath.getFileName() != null
-					&& pathMatcher.matches(filePath.getFileName())) {
-
-				System.out.println("FILE:" + filePath);
-
-				mp3 = new MP3File();
-
-				try {
-					mp3 = parser.readMP3(filePath);
-					mp3.setPath(filePath.toString());
-				}
-
-				catch (IOException e) {
-					return FileVisitResult.CONTINUE;
-				}
-
-				mp3File = new DefaultMutableTreeNode(mp3);
-
-				currentDirectory.add(mp3File);
-
-			}
-			return FileVisitResult.CONTINUE;
-		}
-
-		@Override
-		public FileVisitResult preVisitDirectory(Path directoryPath,
-				BasicFileAttributes attrs) {
-
-			if (directoryPath.getFileName() != null) {
-
-				directory = new Directory(directoryPath.getFileName()
-						.toString());
-				DefaultMutableTreeNode tempDirectory = new DefaultMutableTreeNode(
-						directory);
-				
-				String myPath = directoryPath.toString() + "/cache.xml";
-				File f = new File(myPath);
-				if(f.exists()) { 
-					
-					try {
-						XStream xs = new XStream();
-						ArrayList<Object> list = (ArrayList<Object>) xs.fromXML(new FileInputStream(f));
-						
-						for (int i = 0; i < list.size(); i++) {
-							
-							DefaultMutableTreeNode node = new DefaultMutableTreeNode(directory); 
-							
-							
-							if(list.get(i) instanceof Directory)
-							{
-							directory = (Directory)list.get(i);
-							}
-							else{
-								node.setUserObject(list.get(i));								
-							}
-							tempDirectory.add(node);
-						}
-						
-						
-					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					
-				}
-				
-				
-					
-					
-				if (currentDirectory != null) {
-					
-					currentDirectory.add(tempDirectory);
-					currentDirectory = tempDirectory;
-				
-				} else {
-					
-					currentDirectory = tempDirectory;
-					TreeModel temp = new DefaultTreeModel(currentDirectory);
-					tree = new DefaultMutableTreeNode(temp);
-					GUI.getTree().setModel(temp);
-					
-				}
-				System.out.println("DIR: " + directoryPath);
-			}
-			return FileVisitResult.CONTINUE;
-		}
-
-		@Override
-		public FileVisitResult visitFileFailed(Path filePath, IOException exc) {
-			return FileVisitResult.CONTINUE;
-		}
-
-		@Override
-		public FileVisitResult postVisitDirectory(Path directoryPath,
-				IOException exc) {
-			DefaultMutableTreeNode tempDirectory = currentDirectory;
-			currentDirectory = (DefaultMutableTreeNode) currentDirectory
-					.getParent();
-			if (tempDirectory.getChildCount() == 0) {
-				tempDirectory.removeFromParent();
-			}
-			else{
-				
-				int childCount = tempDirectory.getChildCount();
-				System.out.println(childCount);
-					
-					ArrayList<Object> myChildList = new ArrayList<Object>();
-					
-					for (int i = 0; i < childCount; i++) {
-						DefaultMutableTreeNode node = (DefaultMutableTreeNode) tempDirectory.getChildAt(i);
-						myChildList.add(node.getUserObject());
-					}
-					
-					
-					
-			        XStream xs = new XStream();
-					
-					try {
-					            FileOutputStream fs = new FileOutputStream(directoryPath.toString() + "/cache.xml");
-					            xs.toXML(myChildList, fs);
-					     } catch (FileNotFoundException e1) {
-					            e1.printStackTrace();
-					     }
-
-//					if(childCount==2){
-//						try {
-//							ArrayList<Object> list = (ArrayList<Object>) xs.fromXML(new FileInputStream(directoryPath.toString() + "/cache.xml"));
-//							DefaultMutableTreeNode node = (DefaultMutableTreeNode) tempDirectory.getChildAt(1);
-//							MP3File file = (MP3File) list.get(1);
-//							file.album = "it worked";
-//							node.setUserObject(file);
-//							
-//						} catch (FileNotFoundException e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						}
-//						
-//					}
-					
-			}
-			return FileVisitResult.CONTINUE;
-		}
-
-	}
-
+	
 	/**
 	 * Will wrap the DefaultMutableTree into a JTree and adds all the listener.
 	 * 
@@ -276,8 +120,7 @@ public class Control {
 	public JTree getTree(DefaultMutableTreeNode tree) {
 		// Initialize the tree
 		JTree DataTree = new JTree(tree);
-		DataTree.getSelectionModel().setSelectionMode(
-				TreeSelectionModel.SINGLE_TREE_SELECTION);
+		DataTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		// Listeners are strange...
 		DataTree.addTreeSelectionListener(new TreeListener());
 		return DataTree;
@@ -296,17 +139,14 @@ public class Control {
 		@Override
 		public void valueChanged(TreeSelectionEvent e) {
 			// Get the element that is the depth of the current selection
-			DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.getPath()
-					.getLastPathComponent();
+			DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.getPath().getLastPathComponent();
 			// System.out.println("You selected " + node);
 			if (node == null)
 				return;
 			Object nodeInfo = node.getUserObject();
 			if (node.isLeaf() && nodeInfo instanceof MP3File) {
 				MP3File mp3 = (MP3File) nodeInfo;
-
 				currentMP3 = mp3;
-
 				// Update the UI
 				GUI.setVisibilityOfInfoArea(true);
 				GUI.getSong().setText(mp3.getSong());
@@ -315,17 +155,10 @@ public class Control {
 				GUI.getYear().setText(mp3.getYear());
 				if (mp3.getCover() != null) {
 					ImageIcon newImage = new ImageIcon(mp3.getCover());
-					GUI.getCover().setIcon(
-							new ImageIcon(newImage.getImage()
-									.getScaledInstance(250, 250,
-											java.awt.Image.SCALE_SMOOTH)));
+					GUI.getCover().setIcon(new ImageIcon(newImage.getImage().getScaledInstance(250, 250,java.awt.Image.SCALE_SMOOTH)));
 				} else {
-					ImageIcon newImage = new ImageIcon(Paths.get(
-							"./ressources/noimage.jpg").toString());
-					GUI.getCover().setIcon(
-							new ImageIcon(newImage.getImage()
-									.getScaledInstance(250, 250,
-											java.awt.Image.SCALE_SMOOTH)));
+					ImageIcon newImage = new ImageIcon(Paths.get("./ressources/noimage.jpg").toString());
+					GUI.getCover().setIcon(new ImageIcon(newImage.getImage().getScaledInstance(250, 250,java.awt.Image.SCALE_SMOOTH)));
 				}
 			} else {
 				GUI.setVisibilityOfInfoArea(false);
@@ -363,8 +196,7 @@ public class Control {
 				File selectedFile = theFileChooser.getSelectedFile();
 				try {
 					fillTree(selectedFile.getPath());
-				} catch (JAXBException | FileNotFoundException e) {
-					// TODO Auto-generated catch block
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 				
@@ -379,35 +211,24 @@ public class Control {
 		public void actionPerformed(ActionEvent actionEvent) {
 			JFileChooser theFileChooser = new JFileChooser(".");
 			theFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			FileFilter filter = new FileNameExtensionFilter("Image file",
-					"jpg", "jpeg", "png");
+			FileFilter filter = new FileNameExtensionFilter("Image file","jpg", "jpeg", "png");
 			theFileChooser.setFileFilter(filter);
 			int returnval = theFileChooser.showOpenDialog(null);
-
 			if (returnval == JFileChooser.APPROVE_OPTION) {
 				File selectedFile = theFileChooser.getSelectedFile();
-
 				try {
-					currentMP3
-							.setCover(loadFileFromPersistentStore(selectedFile));
-				}
-
-				catch (Exception e) {
-					// TODO Auto-generated catch block
+					currentMP3.setCover(loadFileFromPersistentStore(selectedFile));
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
-
 				ImageIcon newImage = new ImageIcon(currentMP3.getCover());
-				GUI.getCover().setIcon(
-						new ImageIcon(newImage.getImage().getScaledInstance(
-								250, 250, java.awt.Image.SCALE_SMOOTH)));
+				GUI.getCover().setIcon(new ImageIcon(newImage.getImage().getScaledInstance(250, 250, java.awt.Image.SCALE_SMOOTH)));
 				GUI.getCover().updateUI();
 				MimetypesFileTypeMap mtftp = new MimetypesFileTypeMap();
 				mtftp.addMimeTypes("png jpg jpeg");
 				currentMP3.setPictureMIME("image/"
 						+ mtftp.getContentType(selectedFile));
 				System.out.println(currentMP3.getPictureMIME());
-
 			}
 		}
 	}
@@ -415,11 +236,9 @@ public class Control {
 	private class SaveListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			// TODO Auto-generated method stub
-
-			if (arg0.getActionCommand() == "Metadaten speichern...") {
-
-				if (currentMP3 != null) {
+			if (currentMP3 != null) {
+				// is the year in the correct format?
+				if(GUI.getYear().getText().matches("[0-9]{4}") || GUI.getYear().getText().equals("")){
 					currentMP3.setAlbum(GUI.getAlbum().getText());
 					currentMP3.setArtist(GUI.getArtist().getText());
 					currentMP3.setYear(GUI.getYear().getText());
@@ -427,10 +246,25 @@ public class Control {
 					try {
 						saver.saveMP3(currentMP3);
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+				} else {
+					GUI.getYear().setText("");
 				}
+			}
+
+		}
+	}
+	
+	private class DeleteCoverListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			if (currentMP3 != null) {
+				// is the year in the correct format?
+				currentMP3.setCover(new byte[]{});
+				ImageIcon newImage = new ImageIcon(currentMP3.getCover());
+				GUI.getCover().setIcon(new ImageIcon(newImage.getImage().getScaledInstance(250, 250, java.awt.Image.SCALE_SMOOTH)));
+				GUI.getCover().updateUI();
 			}
 
 		}
@@ -440,38 +274,30 @@ public class Control {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if (currentMP3 != null) {
-				currentMP3.setAlbum(GUI.getAlbum().getText());
-				currentMP3.setArtist(GUI.getArtist().getText());
-				currentMP3.setYear(GUI.getYear().getText());
-				currentMP3.setSong(GUI.getSong().getText());
-				try {
-					saver.saveMP3(currentMP3);
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+				// is the year in the correct format?
+				if(GUI.getYear().getText().matches("[0-9]{4}") || GUI.getYear().getText().equals("")){
+					currentMP3.setAlbum(GUI.getAlbum().getText());
+					currentMP3.setArtist(GUI.getArtist().getText());
+					currentMP3.setYear(GUI.getYear().getText());
+					currentMP3.setSong(GUI.getSong().getText());
+					try {
+						saver.saveMP3(currentMP3);
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				} else {
+					GUI.getYear().setText("");
 				}
-				GUI.getTree().updateUI();
 			}
 		}
-
 		@Override
-		public void mousePressed(MouseEvent e) {
-
-		}
-
+		public void mousePressed(MouseEvent e) {}
 		@Override
-		public void mouseReleased(MouseEvent e) {
-
-		}
-
+		public void mouseReleased(MouseEvent e) {}
 		@Override
-		public void mouseEntered(MouseEvent e) {
-		}
-
+		public void mouseEntered(MouseEvent e) {}
 		@Override
-		public void mouseExited(MouseEvent e) {
-		}
-
+		public void mouseExited(MouseEvent e) {}
 	}
 
 	private byte[] loadFileFromPersistentStore(File file) throws Exception,
@@ -483,4 +309,9 @@ public class Control {
 		return data;
 	}
 
+	
+
+	
 }
+
+

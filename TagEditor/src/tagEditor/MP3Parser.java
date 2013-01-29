@@ -228,6 +228,7 @@ public class MP3Parser {
 		f.setEncodingflag((byte) 1);
 		f.setImageDescription("".getBytes());
 		f.setMIMEType("image/jpg".getBytes());
+		f.setBody("".getBytes());
 		f.setID("APIC");
 		frames.add(f);
 		return f.getBody();

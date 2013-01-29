@@ -6,7 +6,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -24,6 +23,7 @@ import javax.swing.JTree;
  */
 public class View extends JFrame {
 
+	private static final long serialVersionUID = 1L;
 	// Declare the UI elements
 	private JLabel songLabel, artistLabel, albumLabel, yearLabel;
 	private JTextField song, artist, album, year;
@@ -32,9 +32,9 @@ public class View extends JFrame {
 	private JLabel cover;
 	protected JMenuItem jmiSave;
 	protected JMenuItem jmiOpen;
+	protected JMenuItem jmiDeleteCover;
 	protected JButton editCover;
 	private Container informationArea;
-	private JFileChooser fileChooser;
 	private JTree tree;
 	private JSplitPane splitPane;
 	
@@ -79,6 +79,9 @@ public class View extends JFrame {
 	
 	public JButton getEditCover() {
 		return editCover;
+	}
+	public JMenuItem getJmiDeleteCover() {
+		return jmiDeleteCover;
 	}
 
 	/**
@@ -187,6 +190,9 @@ public class View extends JFrame {
 
 		jmiSave = new JMenuItem("Metadaten speichern...");
 		jmiSave.setMnemonic('s');
+		
+		jmiDeleteCover = new JMenuItem("Cover lšschen");
+		fileMenu.add(jmiDeleteCover);
 
 		fileMenu.add(jmiSave);
 
