@@ -58,7 +58,7 @@ public class MP3_FileVisitor extends SimpleFileVisitor<Path> {
 			// Everything worked fine, so let's parse the file
 			if(cacheExists){ 
 				File f = new File(filePath.toString());
-				if(cacheDoc.getElementById(filePath.toString()) == null){ // Is the file in the cache?
+				if(cacheDoc.getElementById(filePath.toString().replace("/", ":").replace(" ", "_")) == null){ // Is the file in the cache?
 					System.out.println("CACHE MISS: FILE:" + filePath);
 					cacheTooOld = true;
 				}
@@ -81,7 +81,7 @@ public class MP3_FileVisitor extends SimpleFileVisitor<Path> {
 			} else {
 				System.out.println("CACHE HIT: FILE:" + filePath.getFileName());
 				// This is how one transfer the node of one document to another, wtf
-				Element temp = cacheDoc.getElementById(filePath.toString());
+				Element temp = cacheDoc.getElementById(filePath.toString().replace("/", ":").replace(" ", "_"));
 				currentDirectory.appendChild(doc.adoptNode(temp.cloneNode(true)));
 			}
 			cacheTooOld = false;

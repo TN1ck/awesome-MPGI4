@@ -3,30 +3,29 @@
 
 <!ELEMENT directory (mp3|directory)*>
 
-<!ELEMENT mp3 (frame|title|artist|album|year|cover)>
+<!ELEMENT mp3 (frame|song|artist|album|year|cover|tagsize)*>
 
-<!ELEMENT tags (title|artist|album|year|cover|ignoredtag)*>
-<!ELEMENT frame (flags|encodingflag|flags|body|pictureType|imageDescription|MIMEType)>
+<!ELEMENT frame (flags|encodingflag|flags|body|pictureType|imageDescription|MIMEType)*>
 
-<!ELEMENT title (text)>
-<!ELEMENT artist (text)>
-<!ELEMENT album (text)>
-<!ELEMENT year (text)>
-<!ELEMENT cover (text)>
 
-<!ELEMENT text (#PCDATA)>
 
-<!ELEMENT flags (text)>
-<!ELEMENT encodingflag (text)>
-<!ELEMENT flags (text)>
-<!ELEMENT body (text)>
-<!ELEMENT pictureType (text)>
-<!ELEMENT imageDescription (text)>
-<!ELEMENT MIMEType (text)>
+<!ELEMENT tagsize (#PCDATA)>
+<!ELEMENT flags (#PCDATA)>
+<!ELEMENT encodingflag (#PCDATA)>
+<!ELEMENT body (#PCDATA)>
+<!ELEMENT pictureType (#PCDATA)>
+<!ELEMENT imageDescription (#PCDATA)>
+<!ELEMENT MIMEType (#PCDATA)>
+
+<!ELEMENT song (#PCDATA)>
+<!ELEMENT artist (#PCDATA)>
+<!ELEMENT album (#PCDATA)>
+<!ELEMENT year (#PCDATA)>
+<!ELEMENT cover (#PCDATA)>
 
 <!ATTLIST frame ID CDATA #REQUIRED>
 
-<!ATTLIST file
+<!ATTLIST directory
 	id 	ID #IMPLIED
 	filename CDATA #REQUIRED
 >

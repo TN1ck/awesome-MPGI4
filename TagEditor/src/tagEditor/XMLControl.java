@@ -128,7 +128,7 @@ public class XMLControl {
 	private static Element fillXml(Document doc, DefaultMutableTreeNode root){
 		 Element currentRoot = doc.createElement("directory");
 		 currentRoot.setAttribute("filename",((Directory) root.getUserObject()).getPath());
-		 currentRoot.setAttribute("id", ((Directory) root.getUserObject()).getPath());
+		 currentRoot.setAttribute("id", ((Directory) root.getUserObject()).getPath().replace("/", ":").replace(" ", "_"));
 		 for(int i = 0; i < root.getChildCount(); i++){
 		    	DefaultMutableTreeNode node = (DefaultMutableTreeNode) root.getChildAt(i);
 		    		if(node.getUserObject() instanceof MP3File) {
@@ -153,7 +153,7 @@ public class XMLControl {
 	 
 		currentElement = doc.createElement("mp3");
 		currentElement.setAttribute("filepath", mp3.getPath());
-		currentElement.setAttribute("id", mp3.getPath());
+		currentElement.setAttribute("id", mp3.getPath().replace("/", ":").replace(" ", "_"));
 			SubElement = doc.createElement("artist");
 			SubElement.appendChild(doc.createTextNode(mp3.getArtist()));
 			currentElement.appendChild(SubElement);

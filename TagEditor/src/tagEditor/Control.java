@@ -2,6 +2,7 @@ package tagEditor;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
@@ -14,6 +15,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.swing.ImageIcon;
@@ -60,22 +62,7 @@ public class Control {
 		GUI.addWindowListener(new WindowAdapter() {
 		@Override
 		public void windowClosing(WindowEvent e) {
-			try {
-				// I should refactor...
-				if(tree != null){
-					XMLControl.writeCache(getRoot(), pathToXML);
-					FileReader in = new FileReader(new File("./ressources/cache.dtd"));
-					FileWriter out = new FileWriter(new File(rootDirectory + "/cache.dtd"));
-					int c;
-					while ((c = in.read()) != -1)
-						out.write(c);
-					in.close();
-					out.close();
-				}
-			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+			saveXML();
 			System.exit(0);
 		}
 		});
@@ -102,13 +89,13 @@ public class Control {
 		}
 		this.tree = new DefaultMutableTreeNode(fileVisitor.getTree());
 		this.rootDirectory = fileVisitor.getRootDirectory();
+		saveXML();
 	}
 	
 	/**
 	 * @return the root of our tree
 	 */
 	public DefaultMutableTreeNode getRoot(){
-		
 		return (DefaultMutableTreeNode) ((DefaultTreeModel) this.tree.getUserObject()).getRoot();
 	}
 	
@@ -132,6 +119,17 @@ public class Control {
 
 	public View getGUI() {
 		return this.GUI;
+	}
+	private void saveXML(){
+	try {
+			if(tree != null){
+				XMLControl.writeCache(getRoot(), pathToXML);
+				Files.copy(Paths.get("./ressources/cache.dtd"), Paths.get(rootDirectory + "/cache.dtd"),StandardCopyOption.REPLACE_EXISTING);
+			}
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 
 	private class TreeListener implements TreeSelectionListener {
@@ -165,19 +163,6 @@ public class Control {
 
 			}
 		}
-	}
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// Create a new Window
-		Control mainProgram = new Control();
-		// Show window
-		mainProgram.getGUI().setVisible(true);
-		// Exit program, if window is closed
-		mainProgram.getGUI().setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
 	}
 
 	/**
@@ -270,7 +255,7 @@ public class Control {
 		}
 	}
 
-	private class MouseSaveListener implements MouseListener {
+	private class MouseSaveListener extends MouseAdapter {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if (currentMP3 != null) {
@@ -290,14 +275,6 @@ public class Control {
 				}
 			}
 		}
-		@Override
-		public void mousePressed(MouseEvent e) {}
-		@Override
-		public void mouseReleased(MouseEvent e) {}
-		@Override
-		public void mouseEntered(MouseEvent e) {}
-		@Override
-		public void mouseExited(MouseEvent e) {}
 	}
 
 	private byte[] loadFileFromPersistentStore(File file) throws Exception,
@@ -309,6 +286,18 @@ public class Control {
 		return data;
 	}
 
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// Create a new Window
+		Control mainProgram = new Control();
+		// Show window
+		mainProgram.getGUI().setVisible(true);
+		// Exit program, if window is closed
+		mainProgram.getGUI().setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+	}
 	
 
 	
