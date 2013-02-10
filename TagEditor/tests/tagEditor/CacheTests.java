@@ -238,6 +238,9 @@ public class CacheTests {
 		myFile = (MP3File) child.getUserObject();
 		// since we have set the album previously it should be that value now
 		assertEquals("test", myFile.album);
+		assertEquals(1, XMLControl.filesReadFromCache);
+		assertEquals(2, myRoot.getChildCount());
+		
 		//lets clean up
 		myFile.album ="bansen";
 		try {
