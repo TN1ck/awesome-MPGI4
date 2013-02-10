@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import static java.nio.file.StandardCopyOption.*;
 
 import javax.swing.Box.Filler;
+import javax.swing.plaf.SliderUI;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -215,6 +216,11 @@ public class CacheTests {
 		DefaultMutableTreeNode child = (DefaultMutableTreeNode) myRoot.getChildAt(1);
 		MP3File myFile = (MP3File) child.getUserObject();
 		myFile.album ="test";
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e1) {
+			fail("exception while sleeping");
+		}
 		try {
 			saver.saveMP3(myFile);
 		} catch (IOException e) {

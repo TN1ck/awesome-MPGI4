@@ -58,11 +58,12 @@ public class MP3_FileVisitor extends SimpleFileVisitor<Path> {
 			// Everything worked fine, so let's parse the file
 			if(cacheExists){ 
 				File f = new File(filePath.toString());
+				long lastmod = f.lastModified();
 				if(cacheDoc.getElementById(filePath.toString().replace("/", ":").replace(" ", "_")) == null){ // Is the file in the cache?
 					System.out.println("CACHE MISS: FILE:" + filePath);
 					cacheTooOld = true;
 				}
-				else if(f.lastModified() > lastTimeCacheChanged){ // Was the file modified?
+				else if( lastmod> lastTimeCacheChanged){ // Was the file modified?
 					System.out.println("MODIFIED: FILE:" + filePath);
 				
 					cacheTooOld = true;
