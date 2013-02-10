@@ -64,6 +64,7 @@ public class MP3_FileVisitor extends SimpleFileVisitor<Path> {
 				}
 				else if(f.lastModified() > lastTimeCacheChanged){ // Was the file modified?
 					System.out.println("MODIFIED: FILE:" + filePath);
+				
 					cacheTooOld = true;
 				}
 			}
@@ -80,6 +81,7 @@ public class MP3_FileVisitor extends SimpleFileVisitor<Path> {
 				currentDirectory.appendChild(mp3File);
 			} else {
 				System.out.println("CACHE HIT: FILE:" + filePath.getFileName());
+				XMLControl.filesReadFromCache++;
 				// This is how one transfer the node of one document to another, wtf
 				Element temp = cacheDoc.getElementById(filePath.toString().replace("/", ":").replace(" ", "_"));
 				currentDirectory.appendChild(doc.adoptNode(temp.cloneNode(true)));

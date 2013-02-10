@@ -24,6 +24,12 @@ import org.xml.sax.SAXException;
 
 public class XMLControl {
 
+	
+	/**
+	 * counts how many files have been read from cache
+	 */
+	public static int filesReadFromCache;
+	
 	/** Reads the xml-file given with file and returns a DefaultMutableTreeNode representation of it
 	 * 
 	 * @param file - the xml-file that shall be read and transformed into a DefaultMutableTreeNode
@@ -33,6 +39,7 @@ public class XMLControl {
 	 * @throws IOException
 	 */
 	public static DefaultMutableTreeNode readCache(File file) throws ParserConfigurationException, SAXException, IOException {
+		filesReadFromCache = 0;
 	    // do something with the current node instead of System.out
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		dbFactory.setValidating(true);
@@ -116,7 +123,7 @@ public class XMLControl {
  		DOMSource source = new DOMSource(doc);
  		StreamResult result = new StreamResult(new File(pathToFile));
  		transformer.transform(source, result);
-	  
+ 	
 	}
 	
 	/** Recursive function that will transform the given DefaultMutableTreeNode into a Element, uses doc as Element-creater-platform...

@@ -1,0 +1,37 @@
+<?xml encoding="utf-8"?>
+<!ELEMENT cache (folder)>
+
+<!ELEMENT directory (mp3|directory)*>
+
+<!ELEMENT mp3 (frame|song|artist|album|year|cover|tagsize)*>
+
+<!ELEMENT frame (flags|encodingflag|flags|body|pictureType|imageDescription|MIMEType)*>
+
+
+
+<!ELEMENT tagsize (#PCDATA)>
+<!ELEMENT flags (#PCDATA)>
+<!ELEMENT encodingflag (#PCDATA)>
+<!ELEMENT body (#PCDATA)>
+<!ELEMENT pictureType (#PCDATA)>
+<!ELEMENT imageDescription (#PCDATA)>
+<!ELEMENT MIMEType (#PCDATA)>
+
+<!ELEMENT song (#PCDATA)>
+<!ELEMENT artist (#PCDATA)>
+<!ELEMENT album (#PCDATA)>
+<!ELEMENT year (#PCDATA)>
+<!ELEMENT cover (#PCDATA)>
+
+<!ATTLIST frame ID CDATA #REQUIRED>
+
+<!ATTLIST directory
+	id 	ID #IMPLIED
+	filename CDATA #REQUIRED
+>
+
+<!ATTLIST mp3
+	id 	ID #IMPLIED
+	filepath CDATA #REQUIRED
+>
+

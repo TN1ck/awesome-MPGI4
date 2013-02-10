@@ -80,6 +80,7 @@ public class Control {
 	 */
 	public void fillTree(String pathToDirectory) throws JAXBException, SAXException, IOException, ParserConfigurationException {	
 		// Check's if there's a cache, if not, it will parse the directory
+		XMLControl.filesReadFromCache = 0;
 		this.pathToXML = pathToDirectory + "/cache.xml";
 		MP3_FileVisitor fileVisitor = new MP3_FileVisitor(this.GUI);
 		try {
